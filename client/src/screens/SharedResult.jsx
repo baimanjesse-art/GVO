@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiGet } from "../lib/api.js";
+import { decodeSolo } from "../lib/shareCode.js";
 import SeasonResults from "../components/SeasonResults.jsx";
 import H2HCompare from "../components/H2HCompare.jsx";
 
@@ -8,6 +9,14 @@ export default function SharedResult({ id, navigate }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Self-contained share codes (solo results) decode entirely client-side.
+    if (id.startsWith("s.")) {
+      const decoded = decodeSolo(id);
+      if (decoded) setData({ mode: "solo", ...decoded });
+      else setError("This share link looks corrupted.");
+      return;
+    }
+    // Legacy / H2H results live on the game server.
     apiGet(`/results/${id}`)
       .then(setData)
       .catch(() => setError("This shared result doesn't exist (or expired)."));
@@ -19,7 +28,7 @@ export default function SharedResult({ id, navigate }) {
         <div className="text-3xl">🤷</div>
         <p className="mt-2 text-slate-400">{error}</p>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/solo")}
           className="mt-4 rounded-xl bg-hoop px-5 py-2.5 font-bold text-black"
         >
           Draft your own squad
@@ -32,9 +41,9 @@ export default function SharedResult({ id, navigate }) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
+    <div className="mx-auto max-w-3xl animate-slide-up space-y-4">
       <div className="rounded-xl border border-hoop/40 bg-hoop/10 px-4 py-2 text-center text-sm">
-        Shared result — think you can do better?{" "}
+        Shared squad — think you can beat this?{" "}
         <button onClick={() => navigate("/solo")} className="font-bold text-hoop2 underline">
           Spin your own
         </button>
@@ -42,12 +51,7 @@ export default function SharedResult({ id, navigate }) {
       {data.mode === "h2h" ? (
         <H2HCompare payload={data} readOnly />
       ) : (
-        <SeasonResults
-          name={data.name}
-          roster={data.roster}
-          result={data.result}
-          shareable={false}
-        />
+        <SeasonResults name={data.name} roster={data.roster} result={data.result} />
       )}
     </div>
   );

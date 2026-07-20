@@ -8,7 +8,11 @@ export default function Leaderboard() {
   useEffect(() => {
     apiGet("/leaderboard")
       .then((data) => setRows(data.leaderboard))
-      .catch(() => setError("Leaderboard unavailable — is the server running?"));
+      .catch(() =>
+        setError(
+          "The ranked ladder lives on the live game server, which isn't running here. Solo mode works everywhere — head-to-head and rankings need the Node server."
+        )
+      );
   }, []);
 
   return (

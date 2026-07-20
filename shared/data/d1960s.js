@@ -2,7 +2,7 @@
 // Stats approximate the player's best season during this team/decade stint.
 export default {
   "Boston Celtics": [
-    ["Bill Russell", "C", 96, 18.9, 24.7, 4.5],
+    ["Bill Russell", "C", 97, 18.9, 24.7, 4.5],
     ["John Havlicek", "SF/SG", 90, 21.4, 6.7, 4.7],
     ["Sam Jones", "SG", 86, 25.9, 5.1, 2.8],
     ["Bob Cousy", "PG", 85, 18.8, 4.7, 8.9],
@@ -12,8 +12,8 @@ export default {
     ["Satch Sanders", "PF", 72, 12.6, 9.7, 1.1],
   ],
   "Los Angeles Lakers": [
-    ["Jerry West", "SG/PG", 95, 31.3, 5.9, 6.1],
-    ["Elgin Baylor", "SF", 94, 38.3, 18.6, 4.6],
+    ["Jerry West", "SG/PG", 96, 31.3, 5.9, 6.1],
+    ["Elgin Baylor", "SF", 95, 38.3, 18.6, 4.6],
     ["Wilt Chamberlain", "C", 93, 20.5, 21.1, 4.5],
     ["Archie Clark", "PG", 74, 19.9, 4.0, 4.4],
     ["Rudy LaRusso", "PF", 75, 17.1, 9.4, 2.2],
@@ -21,7 +21,7 @@ export default {
     ["Darrall Imhoff", "C", 68, 10.7, 13.3, 2.9],
   ],
   "Philadelphia 76ers": [
-    ["Wilt Chamberlain", "C", 99, 33.5, 24.6, 7.8],
+    ["Wilt Chamberlain", "C", 98, 33.5, 24.6, 7.8],
     ["Hal Greer", "SG", 87, 24.1, 5.4, 4.5],
     ["Billy Cunningham", "SF/PF", 86, 21.0, 10.1, 3.0],
     ["Chet Walker", "SF", 82, 19.3, 8.1, 2.7],
@@ -30,7 +30,7 @@ export default {
     ["Larry Costello", "PG", 73, 12.6, 2.5, 3.4],
   ],
   "Cincinnati Royals": [
-    ["Oscar Robertson", "PG", 98, 31.4, 12.5, 11.4],
+    ["Oscar Robertson", "PG", 96, 31.4, 12.5, 11.4],
     ["Jerry Lucas", "PF/C", 89, 21.5, 20.0, 2.8],
     ["Jack Twyman", "SF", 83, 25.3, 8.9, 1.6],
     ["Wayne Embry", "C", 76, 18.6, 13.0, 1.9],
@@ -59,7 +59,7 @@ export default {
     ["Paul Silas", "PF", 71, 9.4, 9.7, 1.7],
   ],
   "San Francisco Warriors": [
-    ["Wilt Chamberlain", "C", 99, 44.8, 24.3, 3.4],
+    ["Wilt Chamberlain", "C", 98, 44.8, 24.3, 3.4],
     ["Rick Barry", "SF", 93, 35.6, 9.2, 3.6],
     ["Nate Thurmond", "C/PF", 88, 20.5, 22.0, 2.5],
     ["Guy Rodgers", "PG", 79, 18.6, 4.5, 10.4],

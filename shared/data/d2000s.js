@@ -1,7 +1,7 @@
 // 2000s pools. Entry format: [name, positions, peakRating, pts, reb, ast]
 export default {
   "Los Angeles Lakers": [
-    ["Shaquille O'Neal", "C", 98, 29.7, 13.6, 3.8],
+    ["Shaquille O'Neal", "C", 97, 29.7, 13.6, 3.8],
     ["Kobe Bryant", "SG", 97, 35.4, 5.3, 4.5],
     ["Pau Gasol", "PF/C", 86, 18.9, 9.6, 3.5],
     ["Lamar Odom", "PF/SF", 79, 15.3, 9.1, 4.6],
@@ -61,7 +61,7 @@ export default {
     ["Kendrick Perkins", "C", 69, 8.1, 6.1, 1.0],
   ],
   "Minnesota Timberwolves": [
-    ["Kevin Garnett", "PF", 97, 24.2, 13.9, 5.0],
+    ["Kevin Garnett", "PF", 96, 24.2, 13.9, 5.0],
     ["Sam Cassell", "PG", 82, 19.8, 3.3, 7.3],
     ["Latrell Sprewell", "SG/SF", 78, 16.8, 3.8, 2.7],
     ["Wally Szczerbiak", "SF", 77, 18.7, 4.8, 2.9],
@@ -91,14 +91,14 @@ export default {
     ["Jamaal Tinsley", "PG", 73, 11.9, 3.3, 6.9],
   ],
   "Philadelphia 76ers": [
-    ["Allen Iverson", "PG/SG", 95, 31.1, 3.8, 4.6],
+    ["Allen Iverson", "PG/SG", 96, 31.1, 3.8, 4.6],
     ["Andre Iguodala", "SF/SG", 79, 19.9, 5.7, 5.6],
     ["Dikembe Mutombo", "C", 81, 11.7, 13.5, 1.2],
     ["Eric Snow", "PG", 72, 12.9, 2.3, 6.6],
     ["Aaron McKie", "SG", 71, 11.6, 4.1, 5.0],
   ],
   "Orlando Magic": [
-    ["Tracy McGrady", "SG/SF", 94, 32.1, 6.5, 5.5],
+    ["Tracy McGrady", "SG/SF", 95, 32.1, 6.5, 5.5],
     ["Dwight Howard", "C", 89, 20.6, 13.8, 1.4],
     ["Rashard Lewis", "SF/PF", 79, 18.2, 5.4, 2.6],
     ["Hedo Turkoglu", "SF", 78, 19.5, 5.7, 5.0],

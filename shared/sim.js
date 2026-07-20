@@ -276,10 +276,13 @@ export function simulateSeason(roster, rng = Math.random) {
   let bestStreak = 0;
   let worstSkid = 0;
   let skid = 0;
+  const games = []; // per-game W/L so the UI can play the season back
   for (let g = 0; g < 82; g++) {
     const oppQuality = gauss(rng); // league opponents vary night to night
     const p = 1 / (1 + Math.exp(-((overall - 52) / 14 - 0.55 * oppQuality)));
-    if (rng() < p) {
+    const won = rng() < p;
+    games.push(won);
+    if (won) {
       wins++;
       streak++;
       skid = 0;
@@ -297,6 +300,7 @@ export function simulateSeason(roster, rng = Math.random) {
     ...evaluation,
     wins,
     losses: 82 - wins,
+    games,
     expectedWins,
     bestStreak,
     worstSkid,

@@ -73,7 +73,9 @@ export function useRoom() {
       wsRef.current = null;
     };
     ws.onerror = () => {
-      setError("Connection error.");
+      setError(
+        "Couldn't reach the live game server — head-to-head needs the Node server running (npm start). Solo mode works everywhere."
+      );
     };
   }, []);
 

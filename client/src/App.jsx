@@ -23,9 +23,9 @@ export default function App() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <button
             onClick={() => navigate("/")}
-            className="text-lg font-black tracking-tight"
+            className="font-display text-2xl font-bold uppercase tracking-wide"
           >
-            🏀 82-0 <span className="text-hoop">ARENA</span>
+            🏀 82-0 <span className="text-hoop">Arena</span>
           </button>
           <nav className="flex gap-1 text-sm font-bold">
             <NavBtn onClick={() => navigate("/solo")} active={page === "solo"}>

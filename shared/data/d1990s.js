@@ -2,7 +2,7 @@
 export default {
   "Chicago Bulls": [
     ["Michael Jordan", "SG", 99, 30.4, 6.4, 5.5],
-    ["Scottie Pippen", "SF", 93, 22.0, 8.7, 5.6],
+    ["Scottie Pippen", "SF", 94, 22.0, 8.7, 5.6],
     ["Dennis Rodman", "PF", 84, 5.5, 15.0, 2.9],
     ["Horace Grant", "PF", 80, 15.1, 11.0, 2.7],
     ["Toni Kukoc", "SF/PF", 79, 13.1, 4.0, 4.6],
@@ -11,7 +11,7 @@ export default {
     ["Luc Longley", "C", 71, 9.1, 5.6, 2.4],
   ],
   "Houston Rockets": [
-    ["Hakeem Olajuwon", "C", 97, 27.3, 11.9, 3.6],
+    ["Hakeem Olajuwon", "C", 98, 27.3, 11.9, 3.6],
     ["Clyde Drexler", "SG", 86, 18.0, 6.0, 5.7],
     ["Charles Barkley", "PF", 86, 19.2, 13.5, 4.7],
     ["Otis Thorpe", "PF", 77, 14.0, 10.6, 2.6],

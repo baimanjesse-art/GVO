@@ -1,7 +1,7 @@
 // 1970s pools. Entry format: [name, positions, peakRating, pts, reb, ast]
 export default {
   "Milwaukee Bucks": [
-    ["Kareem Abdul-Jabbar", "C", 99, 34.8, 16.6, 4.6],
+    ["Kareem Abdul-Jabbar", "C", 98, 34.8, 16.6, 4.6],
     ["Oscar Robertson", "PG", 92, 19.4, 5.7, 8.2],
     ["Marques Johnson", "SF", 85, 25.6, 7.4, 3.5],
     ["Bob Dandridge", "SF", 82, 20.4, 8.0, 3.0],
@@ -49,7 +49,7 @@ export default {
     ["Butch Beard", "PG", 70, 15.5, 4.0, 4.5],
   ],
   "Philadelphia 76ers": [
-    ["Julius Erving", "SF", 94, 23.1, 7.0, 4.6],
+    ["Julius Erving", "SF", 95, 23.1, 7.0, 4.6],
     ["George McGinnis", "PF", 85, 23.0, 12.6, 4.7],
     ["Doug Collins", "SG", 80, 19.5, 3.2, 4.4],
     ["Darryl Dawkins", "C", 76, 13.5, 7.5, 1.5],
@@ -58,7 +58,7 @@ export default {
     ["Henry Bibby", "PG", 71, 11.6, 2.5, 4.0],
   ],
   "Portland Trail Blazers": [
-    ["Bill Walton", "C", 93, 18.6, 14.4, 5.0],
+    ["Bill Walton", "C", 94, 18.6, 14.4, 5.0],
     ["Maurice Lucas", "PF", 84, 20.2, 11.4, 2.9],
     ["Geoff Petrie", "SG", 80, 24.8, 2.8, 4.6],
     ["Sidney Wicks", "PF", 79, 24.5, 10.5, 4.1],

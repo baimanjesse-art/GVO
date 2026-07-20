@@ -1,7 +1,7 @@
 // 2010s pools. Entry format: [name, positions, peakRating, pts, reb, ast]
 export default {
   "Golden State Warriors": [
-    ["Stephen Curry", "PG", 98, 30.1, 5.4, 6.7],
+    ["Stephen Curry", "PG", 96, 30.1, 5.4, 6.7],
     ["Kevin Durant", "SF/PF", 96, 26.4, 6.8, 5.4],
     ["Klay Thompson", "SG", 86, 22.3, 3.8, 2.1],
     ["Draymond Green", "PF", 84, 14.0, 9.5, 7.4],
@@ -10,7 +10,7 @@ export default {
     ["Harrison Barnes", "SF", 74, 11.7, 5.5, 1.8],
   ],
   "Miami Heat": [
-    ["LeBron James", "SF/PF", 99, 26.8, 8.0, 7.3],
+    ["LeBron James", "SF/PF", 98, 26.8, 8.0, 7.3],
     ["Dwyane Wade", "SG", 89, 25.5, 6.9, 4.6],
     ["Chris Bosh", "PF/C", 84, 18.7, 8.3, 1.8],
     ["Hassan Whiteside", "C", 77, 17.0, 14.1, 0.7],
@@ -49,14 +49,14 @@ export default {
     ["J.J. Redick", "SG", 75, 16.4, 2.0, 1.4],
   ],
   "Houston Rockets": [
-    ["James Harden", "SG/PG", 97, 36.1, 6.6, 7.5],
+    ["James Harden", "SG/PG", 96, 36.1, 6.6, 7.5],
     ["Dwight Howard", "C", 79, 18.3, 12.4, 1.8],
     ["Clint Capela", "C", 76, 16.6, 12.7, 1.4],
     ["Eric Gordon", "SG", 75, 16.2, 2.2, 2.5],
     ["Trevor Ariza", "SF", 73, 12.7, 5.9, 2.2],
   ],
   "Toronto Raptors": [
-    ["Kawhi Leonard", "SF", 94, 26.6, 7.3, 3.3],
+    ["Kawhi Leonard", "SF", 95, 26.6, 7.3, 3.3],
     ["DeMar DeRozan", "SG", 84, 27.3, 5.2, 3.9],
     ["Kyle Lowry", "PG", 84, 22.4, 4.7, 7.0],
     ["Pascal Siakam", "PF", 81, 16.9, 6.9, 3.1],

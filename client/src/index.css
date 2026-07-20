@@ -7,39 +7,50 @@
   --color-line: #2a3450;
   --color-hoop: #f97316;
   --color-hoop2: #fdba74;
+  --font-display: "Barlow Condensed", "Arial Narrow", ui-sans-serif, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --animate-pop: pop 0.35s cubic-bezier(0.2, 1.6, 0.4, 1);
   --animate-flash: flash 1s ease-out;
   --animate-floaty: floaty 2.2s ease-in-out infinite;
+  --animate-slide-up: slide-up 0.45s cubic-bezier(0.2, 0.9, 0.3, 1);
+  --animate-reel-shake: reel-shake 0.14s linear infinite;
+  --animate-glow-pulse: glow-pulse 1.6s ease-in-out infinite;
 }
 
 @keyframes pop {
-  0% {
-    transform: scale(0.6);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes flash {
-  0% {
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7);
-  }
-  100% {
-    box-shadow: 0 0 0 18px rgba(249, 115, 22, 0);
-  }
+  0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+  100% { box-shadow: 0 0 0 18px rgba(249, 115, 22, 0); }
 }
 
 @keyframes floaty {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(14px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes reel-shake {
+  0% { transform: translateY(-1px); }
+  50% { transform: translateY(1px); }
+  100% { transform: translateY(-1px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 18px 0 rgba(249, 115, 22, 0.25); }
+  50% { box-shadow: 0 0 30px 4px rgba(249, 115, 22, 0.45); }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate3d(var(--sway, 30px), 105vh, 0) rotate(660deg); opacity: 0.85; }
 }
 
 html {
@@ -47,16 +58,17 @@ html {
 }
 
 body {
-  @apply bg-court text-slate-200 antialiased;
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
+  @apply text-slate-200 antialiased;
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1100px 500px at 50% -10%, rgba(249, 115, 22, 0.09), transparent 65%),
+    radial-gradient(900px 600px at 85% 110%, rgba(56, 89, 220, 0.1), transparent 60%),
+    var(--color-court);
+  background-attachment: fixed;
+}
+
+.font-display {
+  letter-spacing: 0.02em;
 }
 
 ::-webkit-scrollbar {

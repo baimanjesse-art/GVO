@@ -3,63 +3,46 @@ import GradeBadge from "./GradeBadge.jsx";
 import StatBars from "./StatBars.jsx";
 import RosterBoard from "./RosterBoard.jsx";
 import { downloadShareCard, copyText } from "../lib/share.js";
-import { apiPost } from "../lib/api.js";
 
 /**
  * Single-team season result view (used by solo mode and shared-result pages).
+ * `shareCode` (optional) is a self-contained URL code — sharing needs no server.
  */
-export default function SeasonResults({ name, roster, result, shareable = true, onPlayAgain }) {
+export default function SeasonResults({ name, roster, result, shareCode, onPlayAgain }) {
   const [shareState, setShareState] = useState("");
 
   async function handleShareLink() {
-    try {
-      setShareState("…");
-      const { id } = await apiPost("/results", {
-        mode: "solo",
-        name,
-        roster,
-        result: {
-          wins: result.wins,
-          losses: result.losses,
-          grade: result.grade,
-          overall: result.overall,
-          components: result.components,
-          strengths: result.strengths,
-          weaknesses: result.weaknesses,
-          expectedWins: result.expectedWins,
-          bestStreak: result.bestStreak,
-          worstSkid: result.worstSkid,
-        },
-      });
-      const url = `${location.origin}${location.pathname}#/r/${id}`;
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: "82-0 Arena", text: `I went ${result.wins}-${result.losses} (${result.grade}) in 82-0 Arena!`, url });
-          setShareState("shared!");
-          return;
-        } catch {
-          /* fall through to clipboard */
-        }
+    if (!shareCode) return;
+    const url = `${location.origin}${location.pathname}#/r/${shareCode}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "82-0 Arena",
+          text: `I went ${result.wins}-${result.losses} (${result.grade}) in 82-0 Arena!`,
+          url,
+        });
+        setShareState("shared!");
+        return;
+      } catch {
+        /* fall through to clipboard */
       }
-      await copyText(url);
-      setShareState("link copied!");
-    } catch {
-      setShareState("share failed");
     }
+    await copyText(url);
+    setShareState("link copied!");
   }
 
   return (
-    <div className="animate-pop space-y-4">
+    <div className="space-y-4">
       <div className="flex items-center gap-4 rounded-2xl border border-line bg-panel p-4">
         <GradeBadge grade={result.grade} />
         <div className="min-w-0">
-          <div className="text-xs uppercase tracking-widest text-slate-400">
+          <div className="text-[10px] uppercase tracking-[0.3em] text-slate-500">
             {name ? `${name} — ` : ""}Final Record
           </div>
-          <div className="text-4xl font-black tabular-nums sm:text-5xl">
-            {result.wins}
-            <span className="text-slate-500">-</span>
-            {result.losses}
+          <div className="font-display text-5xl font-bold tabular-nums sm:text-6xl">
+            <span className="text-emerald-400">{result.wins}</span>
+            <span className="text-slate-600">–</span>
+            <span className="text-rose-400">{result.losses}</span>
           </div>
           <div className="mt-1 text-xs text-slate-400">
             Overall {result.overall} · projected {result.expectedWins} wins ·
@@ -71,14 +54,14 @@ export default function SeasonResults({ name, roster, result, shareable = true, 
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-line bg-panel p-4">
-          <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-300">
+          <h3 className="mb-3 font-display text-base font-bold uppercase tracking-[0.15em] text-slate-300">
             Season Profile
           </h3>
           <StatBars components={result.components} />
         </div>
         <div className="space-y-4">
           <div className="rounded-2xl border border-emerald-800/50 bg-emerald-950/30 p-4">
-            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-emerald-400">
+            <h3 className="mb-2 font-display text-base font-bold uppercase tracking-[0.15em] text-emerald-400">
               Strengths
             </h3>
             <ul className="space-y-2 text-sm">
@@ -91,7 +74,7 @@ export default function SeasonResults({ name, roster, result, shareable = true, 
             </ul>
           </div>
           <div className="rounded-2xl border border-rose-800/50 bg-rose-950/30 p-4">
-            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-rose-400">
+            <h3 className="mb-2 font-display text-base font-bold uppercase tracking-[0.15em] text-rose-400">
               Weaknesses
             </h3>
             <ul className="space-y-2 text-sm">
@@ -112,12 +95,12 @@ export default function SeasonResults({ name, roster, result, shareable = true, 
         {onPlayAgain && (
           <button
             onClick={onPlayAgain}
-            className="rounded-xl bg-hoop px-5 py-3 font-bold text-black transition hover:bg-hoop2 active:scale-95"
+            className="rounded-xl bg-hoop px-5 py-3 font-display text-lg font-bold uppercase tracking-wider text-black transition hover:bg-hoop2 active:scale-95"
           >
             Run It Back
           </button>
         )}
-        {shareable && (
+        {shareCode && (
           <>
             <button
               onClick={handleShareLink}

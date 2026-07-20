@@ -1,10 +1,34 @@
+import PlayerPhoto from "../components/PlayerPhoto.jsx";
+
+const MARQUEE = [
+  { name: "Michael Jordan", team: "Chicago Bulls" },
+  { name: "Magic Johnson", team: "Los Angeles Lakers" },
+  { name: "Wilt Chamberlain", team: "Philadelphia 76ers" },
+  { name: "Stephen Curry", team: "Golden State Warriors" },
+  { name: "Nikola Jokic", team: "Denver Nuggets" },
+];
+
 export default function Home({ navigate }) {
   return (
     <div className="mx-auto max-w-3xl">
-      <div className="py-8 text-center sm:py-14">
-        <div className="animate-floaty inline-block text-6xl">🏀</div>
-        <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-6xl">
-          82-0 <span className="text-hoop">ARENA</span>
+      <div className="py-8 text-center sm:py-12">
+        <div className="mb-4 flex items-center justify-center">
+          {MARQUEE.map((p, i) => (
+            <div
+              key={p.name}
+              className="animate-slide-up -ml-3 first:ml-0"
+              style={{ animationDelay: `${i * 90}ms`, animationFillMode: "backwards", zIndex: 10 - i }}
+            >
+              <PlayerPhoto
+                name={p.name}
+                team={p.team}
+                className="h-14 w-14 rounded-full border-2 border-court shadow-lg sm:h-16 sm:w-16"
+              />
+            </div>
+          ))}
+        </div>
+        <h1 className="font-display text-6xl font-bold uppercase tracking-tight sm:text-8xl">
+          82-0 <span className="text-hoop">Arena</span>
         </h1>
         <p className="mx-auto mt-3 max-w-md text-sm text-slate-400 sm:text-base">
           Spin the wheel. Get a decade and a franchise. Draft one legend per
@@ -16,10 +40,10 @@ export default function Home({ navigate }) {
       <div className="grid gap-3 sm:grid-cols-2">
         <button
           onClick={() => navigate("/solo")}
-          className="group rounded-2xl border border-line bg-panel p-6 text-left transition hover:border-hoop hover:bg-panel2 active:scale-[0.98]"
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98]"
         >
           <div className="text-3xl">🎰</div>
-          <div className="mt-2 text-xl font-black group-hover:text-hoop2">
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-hoop2">
             Solo Run
           </div>
           <p className="mt-1 text-sm text-slate-400">
@@ -28,10 +52,11 @@ export default function Home({ navigate }) {
         </button>
         <button
           onClick={() => navigate("/h2h")}
-          className="group rounded-2xl border border-line bg-panel p-6 text-left transition hover:border-hoop hover:bg-panel2 active:scale-[0.98]"
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98]"
+          style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
         >
           <div className="text-3xl">⚔️</div>
-          <div className="mt-2 text-xl font-black group-hover:text-hoop2">
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-hoop2">
             Head-to-Head
           </div>
           <p className="mt-1 text-sm text-slate-400">
@@ -41,12 +66,13 @@ export default function Home({ navigate }) {
         </button>
         <button
           onClick={() => navigate("/leaderboard")}
-          className="group rounded-2xl border border-line bg-panel p-6 text-left transition hover:border-hoop hover:bg-panel2 active:scale-[0.98] sm:col-span-2"
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98] sm:col-span-2"
+          style={{ animationDelay: "160ms", animationFillMode: "backwards" }}
         >
           <div className="flex items-center gap-4">
             <div className="text-3xl">🏆</div>
             <div>
-              <div className="text-xl font-black group-hover:text-hoop2">
+              <div className="font-display text-2xl font-bold uppercase tracking-wide group-hover:text-hoop2">
                 Leaderboard
               </div>
               <p className="mt-1 text-sm text-slate-400">
@@ -59,10 +85,10 @@ export default function Home({ navigate }) {
 
       <div className="mt-8 rounded-2xl border border-line bg-panel/60 p-4 text-xs text-slate-500">
         <span className="font-bold text-slate-400">How the sim works:</span>{" "}
-        every player carries a peak-era rating plus scoring, rebounding and
-        playmaking numbers. Your record comes from weighted talent, star
-        power, positional fit, lineup balance — and chemistry penalties when
-        you mix eras that never shared a court.
+        every player carries a 2K-legends-calibrated overall plus scoring,
+        rebounding and playmaking numbers. Your record comes from weighted
+        talent, star power, positional fit, lineup balance — and chemistry
+        penalties when you mix eras that never shared a court.
       </div>
     </div>
   );

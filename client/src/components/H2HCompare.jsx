@@ -1,6 +1,7 @@
 import { useState } from "react";
 import GradeBadge from "./GradeBadge.jsx";
 import RosterBoard from "./RosterBoard.jsx";
+import Confetti from "./Confetti.jsx";
 import { apiPost } from "../lib/api.js";
 import { copyText } from "../lib/share.js";
 
@@ -47,6 +48,7 @@ export default function H2HCompare({ payload, youId, players, onRematch, readOnl
 
   return (
     <div className="animate-pop space-y-4">
+      {youWon && <Confetti />}
       <div
         className={`rounded-2xl border p-5 text-center ${
           youId

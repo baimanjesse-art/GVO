@@ -4,14 +4,27 @@ import { DECADES, TEAM_META, teamMeta } from "../../../shared/constants.js";
 const ALL_TEAMS = Object.keys(TEAM_META);
 
 /**
- * Two-reel slot-machine style spinner. Pass `result` ({decade, team}) and a
- * bumping `spinId` to start a spin; onDone fires when both reels settle.
+ * Two-reel slot-machine spinner. Pass `result` ({decade, team}) and a changing
+ * `spinId` to start a spin; onDone fires when both reels settle. The reels
+ * shake while spinning, tick down like a real wheel, and lock with a
+ * team-colored glow.
  */
 export default function SpinReel({ result, spinId, onDone }) {
   const [decadeText, setDecadeText] = useState("——");
   const [teamText, setTeamText] = useState("Spin to draft");
   const [locked, setLocked] = useState({ decade: false, team: false });
+  const [spinning, setSpinning] = useState(false);
   const timers = useRef([]);
+
+  // reset the reel face when there's no active spin (e.g. between rounds)
+  useEffect(() => {
+    if (!result && !spinning) {
+      setDecadeText("——");
+      setTeamText("Spin to draft");
+      setLocked({ decade: false, team: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
 
   useEffect(() => {
     if (!result || !spinId) return;
@@ -19,15 +32,21 @@ export default function SpinReel({ result, spinId, onDone }) {
     timers.current.forEach(clearTimeout);
     timers.current = [];
     setLocked({ decade: false, team: false });
+    setSpinning(true);
 
     let decadeSettled = false;
-    const shuffle = setInterval(() => {
+    let elapsed = 0;
+    // decelerating ticks: fast blur -> slow clunks, like a real prize wheel
+    const tick = () => {
       if (!decadeSettled) {
         setDecadeText(DECADES[Math.floor(Math.random() * DECADES.length)]);
       }
       setTeamText(ALL_TEAMS[Math.floor(Math.random() * ALL_TEAMS.length)]);
-    }, 70);
-    timers.current.push(shuffle);
+      elapsed += 1;
+      const delay = elapsed < 12 ? 65 : elapsed < 20 ? 100 : 150;
+      timers.current.push(setTimeout(tick, delay));
+    };
+    tick();
 
     const t1 = setTimeout(() => {
       decadeSettled = true;
@@ -35,12 +54,13 @@ export default function SpinReel({ result, spinId, onDone }) {
       setLocked((l) => ({ ...l, decade: true }));
     }, 1100);
     const t2 = setTimeout(() => {
-      clearInterval(shuffle);
+      timers.current.forEach(clearTimeout);
       setDecadeText(result.decade);
       setTeamText(result.team);
       setLocked({ decade: true, team: true });
+      setSpinning(false);
       onDone?.();
-    }, 1900);
+    }, 2100);
     timers.current.push(t1, t2);
 
     return () => {
@@ -50,15 +70,6 @@ export default function SpinReel({ result, spinId, onDone }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spinId]);
 
-  // Freeze display on the real result once a spin has happened.
-  useEffect(() => {
-    if (result && locked.team) {
-      setDecadeText(result.decade);
-      setTeamText(result.team);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result?.decade, result?.team]);
-
   const meta = locked.team && result ? teamMeta(result.team) : null;
 
   return (
@@ -67,29 +78,47 @@ export default function SpinReel({ result, spinId, onDone }) {
         className={`flex-none rounded-2xl border px-4 py-3 text-center transition-all sm:px-6 ${
           locked.decade
             ? "border-hoop bg-panel2 animate-flash"
-            : "border-line bg-panel"
+            : spinning
+              ? "border-line bg-panel animate-reel-shake"
+              : "border-line bg-panel"
         }`}
       >
-        <div className="text-[10px] uppercase tracking-widest text-slate-400">
+        <div className="text-[10px] uppercase tracking-[0.3em] text-slate-500">
           Decade
         </div>
-        <div className="font-mono text-xl font-bold text-hoop2 sm:text-2xl">
+        <div
+          className={`font-display text-2xl font-bold tabular-nums text-hoop2 sm:text-3xl ${
+            spinning && !locked.decade ? "opacity-80 blur-[0.5px]" : ""
+          } ${locked.decade ? "animate-pop" : ""}`}
+        >
           {decadeText}
         </div>
       </div>
       <div
         className={`min-w-0 flex-1 rounded-2xl border px-4 py-3 text-center transition-all sm:px-6 ${
-          locked.team ? "border-hoop bg-panel2 animate-flash" : "border-line bg-panel"
+          locked.team
+            ? "bg-panel2 animate-flash"
+            : spinning
+              ? "border-line bg-panel animate-reel-shake"
+              : "border-line bg-panel"
         }`}
-        style={meta ? { borderColor: meta.color } : undefined}
+        style={
+          meta
+            ? { borderColor: meta.color, boxShadow: `0 0 24px ${meta.color}55` }
+            : undefined
+        }
       >
-        <div className="text-[10px] uppercase tracking-widest text-slate-400">
+        <div className="text-[10px] uppercase tracking-[0.3em] text-slate-500">
           Franchise
         </div>
-        <div className="truncate text-xl font-bold sm:text-2xl">
+        <div
+          className={`truncate font-display text-2xl font-bold uppercase tracking-wide sm:text-3xl ${
+            spinning && !locked.team ? "opacity-80 blur-[0.5px]" : ""
+          } ${locked.team ? "animate-pop" : ""}`}
+        >
           {meta && (
             <span
-              className="mr-2 inline-block rounded px-1.5 text-sm font-black align-middle"
+              className="mr-2 inline-block rounded px-1.5 align-middle font-display text-base font-bold"
               style={{ background: meta.color }}
             >
               {meta.abbr}

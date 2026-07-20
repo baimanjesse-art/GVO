@@ -1,14 +1,14 @@
 // 2020s pools. Entry format: [name, positions, peakRating, pts, reb, ast]
 export default {
   "Denver Nuggets": [
-    ["Nikola Jokic", "C", 99, 26.4, 12.4, 9.0],
+    ["Nikola Jokic", "C", 98, 26.4, 12.4, 9.0],
     ["Jamal Murray", "PG", 84, 21.2, 4.1, 6.2],
     ["Michael Porter Jr.", "SF/PF", 78, 17.4, 5.5, 1.2],
     ["Aaron Gordon", "PF", 77, 16.3, 6.4, 3.0],
     ["Kentavious Caldwell-Pope", "SG", 72, 10.8, 2.7, 2.4],
   ],
   "Milwaukee Bucks": [
-    ["Giannis Antetokounmpo", "PF/C", 98, 31.1, 11.8, 5.7],
+    ["Giannis Antetokounmpo", "PF/C", 97, 31.1, 11.8, 5.7],
     ["Damian Lillard", "PG", 88, 24.3, 4.4, 7.0],
     ["Jrue Holiday", "PG/SG", 82, 19.3, 4.5, 6.8],
     ["Khris Middleton", "SF/SG", 81, 20.4, 6.0, 5.4],
@@ -58,7 +58,7 @@ export default {
     ["Duncan Robinson", "SF/SG", 72, 13.5, 3.2, 1.8],
   ],
   "Oklahoma City Thunder": [
-    ["Shai Gilgeous-Alexander", "PG/SG", 96, 32.7, 5.0, 6.4],
+    ["Shai Gilgeous-Alexander", "PG/SG", 97, 32.7, 5.0, 6.4],
     ["Jalen Williams", "SF/SG", 82, 21.6, 5.3, 5.1],
     ["Chet Holmgren", "C/PF", 81, 16.4, 8.0, 2.4],
     ["Josh Giddey", "PG/SG", 74, 16.6, 7.9, 6.2],
