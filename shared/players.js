@@ -87,6 +87,37 @@ function respinCandidates({ axis, decade, team, usedPoolKeys = [], takenNames = 
   });
 }
 
+/**
+ * Team-only spin inside a locked decade (Historic Battle): rerolls just the
+ * franchise reel. `excludeKeys` drops specific pools (e.g. the opponent's).
+ */
+export function decadeSpin({
+  decade,
+  usedPoolKeys = [],
+  takenNames = [],
+  excludeKeys = [],
+  rng = Math.random,
+  minAvailable = 4,
+} = {}) {
+  const used = new Set([...usedPoolKeys, ...excludeKeys]);
+  const taken = new Set(takenNames);
+  const candidates = POOL_KEYS.filter((key) => {
+    if (!key.startsWith(`${decade}|`)) return false;
+    if (used.has(key)) return false;
+    const avail = POOLS[key].filter((p) => !taken.has(p.name));
+    return avail.length >= minAvailable;
+  });
+  if (candidates.length === 0) return null;
+  const key = candidates[Math.floor(rng() * candidates.length)];
+  const [d, team] = key.split("|");
+  return {
+    key,
+    decade: d,
+    team,
+    players: POOLS[key].filter((p) => !taken.has(p.name)),
+  };
+}
+
 export function canRespin(opts) {
   return respinCandidates(opts).length > 0;
 }

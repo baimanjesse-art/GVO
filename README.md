@@ -18,6 +18,20 @@ WebSocket** server for real-time head-to-head play.
 - The sim engine grades your season with a record, letter grade, component
   breakdown (talent, star power, fit, chemistry, scoring, playmaking,
   rebounding, depth) and strengths/weaknesses commentary.
+- One **era respin** and one **team respin** per draft, and locked-in players
+  can be **rearranged between positions** any time before you sim.
+
+### Historic Battle
+- Spin once to draw your opponent — a real decade/franchise squad, fielded as
+  their strongest actual starting five.
+- Their **era locks**: five team-only spins inside that decade to build the
+  squad that can take them down, then a best-of-7 series decides it.
+
+### All-Time Battle
+- No era lock, but the opponent is a legend: every real **68+ win team**
+  ('96 and '97 Bulls, '16 Warriors, '72 Lakers, '67 Sixers), the **1992
+  Dream Team**, the **2008 Redeem Team**, or the all-time first team.
+- Draft across all of history and try to survive seven games.
 
 ### Head-to-Head (real-time)
 - Create a room, share the 4-letter code (or invite link `#/h2h/CODE`).
@@ -73,10 +87,11 @@ node scripts/timeout-smoke.js   # verifies pick-timer auto-draft (~45s)
 shared/            # code shared by client + server
   constants.js     # positions, decades, timer, team colors
   data/d19XXs.js   # player dataset: decade -> team -> [name, pos, rating, stats]
-  players.js       # pool assembly + spinWheel()
+  players.js       # pool assembly + spinWheel() + respins + decade spins
+  legends.js       # All-Time Battle opponents (68+ win teams, Dream Team…)
   sim.js           # team evaluation, 82-game season sim, best-of-7 series sim
 client/            # React + Tailwind app (Vite root)
-  src/screens/     # Home, SoloGame, H2HGame, Leaderboard, SharedResult
+  src/screens/     # Home, SoloGame, H2HGame, BattleGame, Leaderboard, SharedResult
   src/components/  # SpinReel, PlayerCard, RosterBoard, results views, chat…
 server/            # Express + ws
   index.js         # HTTP API + websocket endpoint (+ static dist in prod)
@@ -105,9 +120,9 @@ Each roster gets component scores (0–100):
   natural position(s).
 - **Scoring / playmaking / rebounding** — summed per-game production vs
   league-shaped thresholds.
-- **Chemistry** — penalties for mixing many decades and for wide era spans
-  (a 1960s + 2020s locker room has… issues), plus a small bonus when
-  teammates share franchise DNA.
+- **Chemistry** — a small bonus when teammates share franchise DNA. Mixing
+  eras is never penalized: cross-generation super teams are the point of
+  the game.
 
 The weighted overall maps through a logistic curve to a per-game win
 probability, jittered by nightly opponent strength, and the season is played

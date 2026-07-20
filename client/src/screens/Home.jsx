@@ -65,9 +65,37 @@ export default function Home({ navigate }) {
           </p>
         </button>
         <button
+          onClick={() => navigate("/battle/historic")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98]"
+          style={{ animationDelay: "160ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">🏛️</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-hoop2">
+            Historic Battle
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            One spin draws a real team and locks their era. Beat the actual
+            squad with players from their own decade.
+          </p>
+        </button>
+        <button
+          onClick={() => navigate("/battle/alltime")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98]"
+          style={{ animationDelay: "240ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">👑</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-hoop2">
+            All-Time Battle
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            The 72-10 Bulls, the 73-9 Warriors, even the Dream Team — draft
+            across every era and take down a legend.
+          </p>
+        </button>
+        <button
           onClick={() => navigate("/leaderboard")}
           className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98] sm:col-span-2"
-          style={{ animationDelay: "160ms", animationFillMode: "backwards" }}
+          style={{ animationDelay: "320ms", animationFillMode: "backwards" }}
         >
           <div className="flex items-center gap-4">
             <div className="text-3xl">🏆</div>
@@ -87,8 +115,9 @@ export default function Home({ navigate }) {
         <span className="font-bold text-slate-400">How the sim works:</span>{" "}
         every player carries a 2K-legends-calibrated overall plus scoring,
         rebounding and playmaking numbers. Your record comes from weighted
-        talent, star power, positional fit, lineup balance — and chemistry
-        penalties when you mix eras that never shared a court.
+        talent, star power, positional fit and lineup balance. Mixing eras is
+        the whole point — build the cross-generation super team the debates
+        are made of.
       </div>
     </div>
   );

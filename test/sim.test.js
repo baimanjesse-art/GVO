@@ -1,6 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { POOLS, POOL_KEYS, spinWheel, respinSpin, canRespin } from "../shared/players.js";
+import {
+  POOLS,
+  POOL_KEYS,
+  spinWheel,
+  respinSpin,
+  canRespin,
+  decadeSpin,
+} from "../shared/players.js";
 import { POSITIONS, TEAM_META, DECADES } from "../shared/constants.js";
 import {
   evaluateTeam,
@@ -8,9 +15,11 @@ import {
   simulateSeries,
   statEdges,
   bestPick,
+  bestLineup,
   makeRng,
   gradeForWins,
 } from "../shared/sim.js";
+import { LEGENDS, randomLegend } from "../shared/legends.js";
 
 test("every pool has at least 5 players with valid fields", () => {
   assert.ok(POOL_KEYS.length >= 80, `expected many pools, got ${POOL_KEYS.length}`);
@@ -155,6 +164,108 @@ test("era respin keeps the franchise, team respin keeps the decade", () => {
     rng,
   });
   assert.equal(eraAfterTaken, null, "no Bulls decade left once pools are used/emptied");
+});
+
+test("era mixing is never penalized", () => {
+  // Same five players, but one roster is single-decade and the other spans
+  // all seven decades. Chemistry (and overall) must not favor either.
+  const base = [
+    { name: "P1", positions: ["PG"], rating: 90, pts: 20, reb: 4, ast: 8 },
+    { name: "P2", positions: ["SG"], rating: 90, pts: 22, reb: 4, ast: 4 },
+    { name: "P3", positions: ["SF"], rating: 90, pts: 20, reb: 7, ast: 4 },
+    { name: "P4", positions: ["PF"], rating: 90, pts: 18, reb: 10, ast: 3 },
+    { name: "P5", positions: ["C"], rating: 90, pts: 16, reb: 12, ast: 2 },
+  ];
+  const teams = ["Boston Celtics", "Chicago Bulls", "Utah Jazz", "Miami Heat", "Phoenix Suns"];
+  const sameEra = {};
+  const mixedEra = {};
+  POSITIONS.forEach((pos, i) => {
+    sameEra[pos] = { ...base[i], team: teams[i], decade: "1990s" };
+    mixedEra[pos] = { ...base[i], team: teams[i], decade: DECADES[i + 2] };
+  });
+  const a = evaluateTeam(sameEra);
+  const b = evaluateTeam(mixedEra);
+  assert.equal(a.components.chemistry, b.components.chemistry);
+  assert.equal(a.overall, b.overall);
+});
+
+test("bestLineup fields a sane starting five from a pool", () => {
+  const lineup = bestLineup(POOLS["1990s|Chicago Bulls"]);
+  assert.ok(lineup, "lineup built");
+  const names = POSITIONS.map((pos) => lineup[pos].name);
+  assert.equal(new Set(names).size, 5, "five distinct players");
+  assert.equal(lineup.SG.name, "Michael Jordan");
+  const ev = evaluateTeam(lineup);
+  assert.ok(ev.overall > 60, `72-win Bulls core rated ${ev.overall}`);
+});
+
+test("decadeSpin locks the decade and respects exclusions", () => {
+  const rng = makeRng(3);
+  for (let i = 0; i < 30; i++) {
+    const s = decadeSpin({ decade: "1960s", excludeKeys: ["1960s|Boston Celtics"], rng });
+    assert.ok(s, "spin lands");
+    assert.equal(s.decade, "1960s");
+    assert.notEqual(s.key, "1960s|Boston Celtics");
+  }
+  // Five sequential team-only spins always succeed even in the smallest decade.
+  for (const decade of DECADES) {
+    for (const excludeKey of POOL_KEYS.filter((k) => k.startsWith(decade)).slice(0, 3)) {
+      const taken = POOLS[excludeKey].slice(0, 5).map((p) => p.name);
+      const used = [];
+      for (let round = 0; round < 5; round++) {
+        const s = decadeSpin({
+          decade,
+          usedPoolKeys: used,
+          takenNames: taken,
+          excludeKeys: [excludeKey],
+          rng,
+        });
+        assert.ok(s, `${decade} round ${round + 1} vs ${excludeKey} has a pool`);
+        used.push(s.key);
+      }
+    }
+  }
+});
+
+test("legend opponents are valid rosters", () => {
+  assert.ok(LEGENDS.length >= 6, `only ${LEGENDS.length} legends`);
+  const ids = LEGENDS.map((l) => l.id);
+  assert.equal(new Set(ids).size, ids.length, "legend ids unique");
+  for (const legend of LEGENDS) {
+    assert.ok(legend.name && legend.record && legend.color && legend.tagline, `${legend.id} metadata`);
+    const names = POSITIONS.map((pos) => legend.roster[pos]?.name);
+    assert.ok(names.every(Boolean), `${legend.id} has all five slots`);
+    assert.equal(new Set(names).size, 5, `${legend.id} five distinct players`);
+    for (const pos of POSITIONS) {
+      const player = legend.roster[pos];
+      assert.ok(
+        player.positions.every((pp) => POSITIONS.includes(pp)),
+        `${legend.id} ${player.name} bad positions`
+      );
+      assert.ok(player.rating >= 70 && player.rating <= 99, `${legend.id} ${player.name} rating`);
+    }
+    const ev = evaluateTeam(legend.roster);
+    assert.ok(ev.overall >= 65, `${legend.id} rated ${ev.overall} — too weak for a legend`);
+  }
+  // The all-time first team should be the scariest matchup in the pool.
+  const goat = LEGENDS.find((l) => l.id === "goat");
+  const goatOverall = evaluateTeam(goat.roster).overall;
+  for (const legend of LEGENDS) {
+    assert.ok(goatOverall >= evaluateTeam(legend.roster).overall, `${legend.id} outrates the GOAT squad`);
+  }
+  const rng = makeRng(5);
+  for (let i = 0; i < 20; i++) assert.ok(LEGENDS.includes(randomLegend(rng)));
+});
+
+test("LeBron is a 99 who can play all five positions in every era", () => {
+  const lebrons = Object.values(POOLS)
+    .flat()
+    .filter((p) => p.name === "LeBron James");
+  assert.ok(lebrons.length >= 3, "LeBron appears across eras");
+  for (const lb of lebrons) {
+    assert.equal(lb.rating, 99, `${lb.decade} LeBron rated ${lb.rating}`);
+    assert.deepEqual(lb.positions, POSITIONS, `${lb.decade} LeBron positions ${lb.positions}`);
+  }
 });
 
 test("bestPick fills the most valuable open slot", () => {

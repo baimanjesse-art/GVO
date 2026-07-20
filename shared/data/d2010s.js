@@ -10,7 +10,7 @@ export default {
     ["Harrison Barnes", "SF", 74, 11.7, 5.5, 1.8],
   ],
   "Miami Heat": [
-    ["LeBron James", "SF/PF", 98, 26.8, 8.0, 7.3],
+    ["LeBron James", "PG/SG/SF/PF/C", 99, 26.8, 8.0, 7.3],
     ["Dwyane Wade", "SG", 89, 25.5, 6.9, 4.6],
     ["Chris Bosh", "PF/C", 84, 18.7, 8.3, 1.8],
     ["Hassan Whiteside", "C", 77, 17.0, 14.1, 0.7],
@@ -27,7 +27,7 @@ export default {
     ["Patty Mills", "PG", 71, 10.2, 2.1, 3.5],
   ],
   "Cleveland Cavaliers": [
-    ["LeBron James", "SF/PF", 98, 27.5, 7.4, 8.7],
+    ["LeBron James", "PG/SG/SF/PF/C", 99, 27.5, 7.4, 8.7],
     ["Kyrie Irving", "PG", 89, 25.2, 3.2, 5.8],
     ["Kevin Love", "PF/C", 82, 17.6, 10.5, 1.8],
     ["Tristan Thompson", "C/PF", 72, 10.1, 9.2, 0.8],

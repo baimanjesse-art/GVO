@@ -2,6 +2,7 @@ import { useHashRoute } from "./lib/router.js";
 import Home from "./screens/Home.jsx";
 import SoloGame from "./screens/SoloGame.jsx";
 import H2HGame from "./screens/H2HGame.jsx";
+import BattleGame from "./screens/BattleGame.jsx";
 import Leaderboard from "./screens/Leaderboard.jsx";
 import SharedResult from "./screens/SharedResult.jsx";
 
@@ -13,6 +14,8 @@ export default function App() {
   if (!page) screen = <Home navigate={navigate} />;
   else if (page === "solo") screen = <SoloGame />;
   else if (page === "h2h") screen = <H2HGame inviteCode={param} />;
+  else if (page === "battle")
+    screen = <BattleGame key={param || "pick"} mode={param} navigate={navigate} />;
   else if (page === "leaderboard") screen = <Leaderboard />;
   else if (page === "r" && param) screen = <SharedResult id={param} navigate={navigate} />;
   else screen = <Home navigate={navigate} />;
@@ -33,6 +36,10 @@ export default function App() {
             </NavBtn>
             <NavBtn onClick={() => navigate("/h2h")} active={page === "h2h"}>
               H2H
+            </NavBtn>
+            <NavBtn onClick={() => navigate("/battle")} active={page === "battle"}>
+              <span className="sm:hidden">⚔️</span>
+              <span className="hidden sm:inline">Battles</span>
             </NavBtn>
             <NavBtn
               onClick={() => navigate("/leaderboard")}

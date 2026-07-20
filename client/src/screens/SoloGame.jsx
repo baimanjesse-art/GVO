@@ -67,6 +67,18 @@ export default function SoloGame() {
     if (pick) setSelected(pick.player);
   }
 
+  // Rearrange locked-in players between slots (history follows so share
+  // codes rebuild the final arrangement, not the original draft order).
+  function handleSwap(a, b) {
+    if (a === b) return;
+    setRoster((r) => ({ ...r, [a]: r[b], [b]: r[a] }));
+    setHistory((h) =>
+      h.map((e) =>
+        e.slot === a ? { ...e, slot: b } : e.slot === b ? { ...e, slot: a } : e
+      )
+    );
+  }
+
   // One era respin (keep the franchise, reroll the decade) and one team
   // respin (keep the decade, reroll the franchise) per draft.
   const respinBase = spin
@@ -268,6 +280,7 @@ export default function SoloGame() {
           roster={roster}
           placing={phase === "picking" ? selected : null}
           onPlace={handlePlace}
+          onSwap={handleSwap}
           title="Your Squad"
         />
       </div>

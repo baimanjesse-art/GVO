@@ -81,14 +81,14 @@ export function evaluateTeam(roster) {
   const totReb = players.reduce((s, p) => s + p.reb, 0);
   const totAst = players.reduce((s, p) => s + p.ast, 0);
   const scoring = pct((totPts - 75) / (125 - 75));
-  const rebounding = pct((totReb - 30) / (62 - 30));
+  const rebounding = pct((totReb - 22) / (48 - 22));
   const playmaking = pct((totAst - 12) / (30 - 12));
 
-  // Chemistry: era mixing hurts, shared franchise culture helps.
+  // Chemistry: shared franchise culture helps. Mixing eras is the whole point
+  // of the game, so cross-decade rosters are never penalized for it.
   const decadeIdxs = players.map((p) => DECADE_INDEX[p.decade]);
   const distinctDecades = new Set(decadeIdxs).size;
   const eraSpan = Math.max(...decadeIdxs) - Math.min(...decadeIdxs);
-  let chemistry = 100 - (distinctDecades - 1) * 7 - Math.max(0, eraSpan - 1) * 4;
   const franchises = players.map((p) => p.team);
   let franchisePairs = 0;
   for (let i = 0; i < franchises.length; i++) {
@@ -97,7 +97,7 @@ export function evaluateTeam(roster) {
     }
   }
   const franchiseBonus = Math.min(10, franchisePairs * 5);
-  chemistry = Math.max(0, Math.min(100, chemistry + franchiseBonus));
+  const chemistry = Math.min(100, 90 + franchiseBonus);
 
   const overall =
     0.4 * talent +
@@ -163,8 +163,8 @@ const COMPONENT_TEXT = {
   },
   chemistry: {
     label: "Chemistry",
-    strong: "Eras and styles mesh — this group plays like they've met before.",
-    weak: "An era-clash locker room: pace, spacing and egos don't align.",
+    strong: "Shared roots and meshing styles — this group plays like they've met before.",
+    weak: "A locker room still finding its identity — no shared history to lean on.",
   },
   scoring: {
     label: "Scoring",
@@ -219,11 +219,11 @@ function describeTeam(components, meta) {
       text: "All five stars from the same decade — instant on-court telepathy.",
     });
   } else if (meta.eraSpan >= 4) {
-    weaknesses.unshift({
+    strengths.unshift({
       key: "era",
-      label: "Era Clash",
-      score: Math.max(0, 60 - meta.eraSpan * 8),
-      text: `Roster spans ${meta.eraSpan + 0} decades of basketball evolution — training camp is a culture war.`,
+      label: "Time Machine",
+      score: 95,
+      text: `Legends spanning ${meta.eraSpan + 1} decades of basketball — the super team fans only get to argue about.`,
     });
   }
   if (meta.franchisePairs > 0) {
@@ -372,6 +372,39 @@ export function statEdges(evalA, evalB) {
 // ---------------------------------------------------------------------------
 // Auto-pick (used for H2H pick-timer expiry and "best fit" hints)
 // ---------------------------------------------------------------------------
+
+/**
+ * Build the strongest starting five from a pool: brute-force the assignment
+ * of players to the five slots that maximizes rating minus out-of-position
+ * penalties. Pools are small (≤ ~10), so exhaustive search is cheap.
+ * Used to field the "actual team" opponents in the battle modes.
+ */
+export function bestLineup(pool) {
+  if (pool.length < POSITIONS.length) return null;
+  let best = null;
+  const used = new Array(pool.length).fill(false);
+  const assign = {};
+  function place(slotIdx, value) {
+    if (slotIdx === POSITIONS.length) {
+      if (!best || value > best.value) best = { value, roster: { ...assign } };
+      return;
+    }
+    const slot = POSITIONS[slotIdx];
+    for (let i = 0; i < pool.length; i++) {
+      if (used[i]) continue;
+      used[i] = true;
+      assign[slot] = pool[i];
+      place(
+        slotIdx + 1,
+        value + pool[i].rating - OOP_PENALTY[fitDistance(pool[i], slot)]
+      );
+      used[i] = false;
+    }
+    delete assign[slot];
+  }
+  place(0, 0);
+  return best ? best.roster : null;
+}
 
 /**
  * Choose the best available player + open slot for a partially-filled roster.

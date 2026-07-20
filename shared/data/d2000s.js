@@ -46,7 +46,7 @@ export default {
     ["Udonis Haslem", "PF", 72, 10.9, 8.1, 1.2],
   ],
   "Cleveland Cavaliers": [
-    ["LeBron James", "SF/PG", 98, 30.0, 7.9, 7.2],
+    ["LeBron James", "PG/SG/SF/PF/C", 99, 30.0, 7.9, 7.2],
     ["Zydrunas Ilgauskas", "C", 77, 16.9, 7.7, 1.6],
     ["Mo Williams", "PG", 76, 17.8, 3.4, 4.1],
     ["Ricky Davis", "SG", 75, 20.6, 4.9, 5.5],

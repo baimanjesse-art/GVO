@@ -37,7 +37,7 @@ export default {
     ["Mikal Bridges", "SF", 76, 14.2, 4.2, 2.3],
   ],
   "Los Angeles Lakers": [
-    ["LeBron James", "SF/PG", 94, 30.3, 8.2, 6.2],
+    ["LeBron James", "PG/SG/SF/PF/C", 99, 30.3, 8.2, 6.2],
     ["Anthony Davis", "PF/C", 91, 26.9, 12.5, 3.5],
     ["Russell Westbrook", "PG", 79, 18.5, 7.4, 7.1],
     ["Austin Reaves", "SG/PG", 76, 15.9, 4.3, 5.5],
