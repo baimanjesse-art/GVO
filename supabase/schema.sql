@@ -234,6 +234,35 @@ begin
   return r;
 end; $$;
 
+-- Offline battle results (Historic / All-Time) count toward the account rank
+-- when logged in. Single-player, so it's trust-based — it only moves your own
+-- rank. Mirrors the client's overall→Elo mapping and K=32 update.
+create or replace function public.apply_offline_result(p_won boolean, p_opp_overall numeric)
+returns public.profiles language plpgsql security definer set search_path = public as $$
+declare
+  me public.profiles;
+  opp_elo int;
+  expected numeric;
+  delta int;
+  new_elo int;
+begin
+  select * into me from public.profiles where id = auth.uid() for update;
+  if not found then raise exception 'No profile'; end if;
+  opp_elo := greatest(760, least(2050, round(880 + (p_opp_overall - 48) * 20)));
+  expected := 1.0 / (1.0 + power(10, (opp_elo - me.elo) / 400.0));
+  delta := round(32 * ((case when p_won then 1 else 0 end) - expected));
+  new_elo := greatest(0, me.elo + delta);
+  update public.profiles
+     set elo = new_elo,
+         best_elo = greatest(best_elo, new_elo),
+         wins = wins + (case when p_won then 1 else 0 end),
+         losses = losses + (case when p_won then 0 else 1 end),
+         updated_at = now()
+   where id = auth.uid()
+   returning * into me;
+  return me;
+end; $$;
+
 -- Let signed-in users call the functions.
 grant execute on function
   public.create_draft_room(text),
@@ -241,7 +270,8 @@ grant execute on function
   public.start_draft(text, jsonb, bigint),
   public.make_pick(text, jsonb),
   public.submit_roster(text, jsonb),
-  public.finish_draft(text, int, jsonb)
+  public.finish_draft(text, int, jsonb),
+  public.apply_offline_result(boolean, numeric)
 to authenticated;
 
 -- ---------------------------------------------------------------------------

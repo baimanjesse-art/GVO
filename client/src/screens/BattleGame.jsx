@@ -18,6 +18,9 @@ import CourtBoard from "../components/CourtBoard.jsx";
 import H2HCompare from "../components/H2HCompare.jsx";
 import RankBadge from "../components/RankBadge.jsx";
 import { recordBattle } from "../lib/career.js";
+import { useAuth } from "../lib/auth.jsx";
+import { supabase } from "../lib/supabase.js";
+import { rankFor } from "../../../shared/ranks.js";
 
 const EMPTY_ROSTER = { PG: null, SG: null, SF: null, PF: null, C: null };
 
@@ -38,6 +41,7 @@ export default function BattleGame({ mode, navigate }) {
 }
 
 function Battle({ mode }) {
+  const { user, profile, refreshProfile } = useAuth();
   // scout | scout-spin | idle | spinning | picking | results
   const [phase, setPhase] = useState("scout");
   const [opponent, setOpponent] = useState(null);
@@ -166,16 +170,13 @@ function Battle({ mode }) {
   }
 
   // --- the battle ----------------------------------------------------------
-  function runBattle() {
+  async function runBattle() {
     const rng = makeRng((Math.random() * 2 ** 31) >>> 0);
     const evYou = evaluateTeam(roster);
     const evOpp = evaluateTeam(opponent.roster);
     const series = simulateSeries(evYou, evOpp, rng);
     const won = series.winner === "A";
-    // Persist the offline battle-career rating (opponent Elo scales with how
-    // loaded their squad is, so beating a legend moves you far more).
-    const career = recordBattle({ won, oppOverall: evOpp.overall, mode });
-    setResult({
+    const base = {
       order: ["you", "opp"],
       names: { you: "Your Squad", opp: opponent.name },
       seasons: {
@@ -186,9 +187,42 @@ function Battle({ mode }) {
       series,
       edges: statEdges(evYou, evOpp),
       winnerId: won ? "you" : "opp",
-      career,
-    });
+    };
+    // Show results immediately; the rank update fills in once recorded.
+    setResult(base);
     setPhase("results");
+
+    // Logged in → the result counts toward the permanent account rank.
+    // Logged out → it updates the on-device Battle Rank (opponent Elo scales
+    // with how loaded their squad is, so beating a legend moves you far more).
+    if (user) {
+      const before = profile?.elo ?? 1000;
+      const { data } = await supabase.rpc("apply_offline_result", {
+        p_won: won,
+        p_opp_overall: evOpp.overall,
+      });
+      const after = data?.elo ?? before;
+      setResult({
+        ...base,
+        career: {
+          mode,
+          won,
+          before: Math.round(before),
+          after: Math.round(after),
+          delta: Math.round(after - before),
+          rankBefore: rankFor(before),
+          rankAfter: rankFor(after),
+          promoted: rankFor(after).index > rankFor(before).index,
+          demoted: rankFor(after).index < rankFor(before).index,
+          wins: data?.wins ?? 0,
+          losses: data?.losses ?? 0,
+          account: true,
+        },
+      });
+      refreshProfile?.();
+    } else {
+      setResult({ ...base, career: recordBattle({ won, oppOverall: evOpp.overall, mode }) });
+    }
   }
 
   function reset() {
@@ -446,7 +480,7 @@ function CareerUpdate({ career }) {
           Battle Rank
         </span>
         <span className="text-[11px] uppercase tracking-wide text-slate-500">
-          offline career · {career.wins}W-{career.losses}L
+          {career.account ? "account rank" : "offline career"} · {career.wins}W-{career.losses}L
         </span>
       </div>
       <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">

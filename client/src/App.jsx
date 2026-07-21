@@ -3,8 +3,12 @@ import Home from "./screens/Home.jsx";
 import SoloGame from "./screens/SoloGame.jsx";
 import H2HGame from "./screens/H2HGame.jsx";
 import BattleGame from "./screens/BattleGame.jsx";
+import DraftGame from "./screens/DraftGame.jsx";
 import Leaderboard from "./screens/Leaderboard.jsx";
 import SharedResult from "./screens/SharedResult.jsx";
+import Account from "./screens/Account.jsx";
+import { useAuth } from "./lib/auth.jsx";
+import RankBadge from "./components/RankBadge.jsx";
 
 export default function App() {
   const [segments, navigate] = useHashRoute();
@@ -14,9 +18,11 @@ export default function App() {
   if (!page) screen = <Home navigate={navigate} />;
   else if (page === "solo") screen = <SoloGame />;
   else if (page === "h2h") screen = <H2HGame inviteCode={param} />;
+  else if (page === "draft") screen = <DraftGame code={param} navigate={navigate} />;
   else if (page === "battle")
     screen = <BattleGame key={param || "pick"} mode={param} navigate={navigate} />;
   else if (page === "leaderboard") screen = <Leaderboard />;
+  else if (page === "account") screen = <Account navigate={navigate} />;
   else if (page === "r" && param) screen = <SharedResult id={param} navigate={navigate} />;
   else screen = <Home navigate={navigate} />;
 
@@ -34,12 +40,13 @@ export default function App() {
               <span className="text-slate-200">Arena</span>
             </span>
           </button>
-          <nav className="flex gap-1 text-sm font-bold">
+          <nav className="flex items-center gap-1 text-sm font-bold">
             <NavBtn onClick={() => navigate("/solo")} active={page === "solo"}>
               Solo
             </NavBtn>
-            <NavBtn onClick={() => navigate("/h2h")} active={page === "h2h"}>
-              H2H
+            <NavBtn onClick={() => navigate("/draft")} active={page === "draft"}>
+              <span className="sm:hidden">🎯</span>
+              <span className="hidden sm:inline">Draft</span>
             </NavBtn>
             <NavBtn onClick={() => navigate("/battle")} active={page === "battle"}>
               <span className="sm:hidden">⚔️</span>
@@ -50,13 +57,45 @@ export default function App() {
               active={page === "leaderboard"}
             >
               <span className="sm:hidden">🏆</span>
-              <span className="hidden sm:inline">Leaderboard</span>
+              <span className="hidden sm:inline">Ranks</span>
             </NavBtn>
+            <AccountChip navigate={navigate} active={page === "account"} />
           </nav>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-4 pb-16 sm:py-6">{screen}</main>
     </div>
+  );
+}
+
+function AccountChip({ navigate, active }) {
+  const { user, profile, configured, loading } = useAuth();
+  if (!configured) return null;
+  const ring = active ? "border-hoop" : "border-line hover:border-hoop/60";
+  if (loading) {
+    return <span className={`ml-1 rounded-full border ${ring} px-3 py-1.5 text-slate-500`}>…</span>;
+  }
+  if (!user) {
+    return (
+      <button
+        onClick={() => navigate("/account")}
+        className={`ml-1 rounded-full border ${ring} bg-panel2 px-3 py-1.5 font-display uppercase tracking-wider text-slate-300 transition`}
+      >
+        Sign in
+      </button>
+    );
+  }
+  return (
+    <button
+      onClick={() => navigate("/account")}
+      title={profile?.username || "Account"}
+      className={`ml-1 flex items-center gap-1.5 rounded-full border ${ring} bg-panel2 px-2 py-1 transition`}
+    >
+      <span className="hidden max-w-[7rem] truncate font-display text-xs uppercase tracking-wider text-slate-200 sm:block">
+        {profile?.username || "You"}
+      </span>
+      <RankBadge elo={profile?.elo ?? 1000} size="sm" />
+    </button>
   );
 }
 

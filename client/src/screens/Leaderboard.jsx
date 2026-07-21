@@ -3,23 +3,47 @@ import { apiGet } from "../lib/api.js";
 import { RANKS, rankFor } from "../../../shared/ranks.js";
 import { getCareer } from "../lib/career.js";
 import RankBadge from "../components/RankBadge.jsx";
+import { useAuth } from "../lib/auth.jsx";
+import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
 
 export default function Leaderboard() {
+  const { user, profile } = useAuth();
   const [rows, setRows] = useState(null);
   const [error, setError] = useState(null);
   const [career] = useState(() => getCareer());
 
   useEffect(() => {
+    if (isSupabaseConfigured) {
+      supabase
+        .from("leaderboard")
+        .select("*")
+        .limit(50)
+        .then(({ data, error: err }) => {
+          if (err) setError("Couldn't load the ranked ladder.");
+          else setRows(data || []);
+        });
+      return;
+    }
     apiGet("/leaderboard")
       .then((data) => setRows(data.leaderboard))
       .catch(() =>
         setError(
-          "The online ladder lives on the live game server, which isn't running here. Solo and battle modes work everywhere — head-to-head rankings need the Node server."
+          "The online ladder needs the game backend. Solo and battle modes work everywhere — your Battle Rank is saved on this device."
         )
       );
   }, []);
 
-  const careerRank = rankFor(career.elo);
+  // Signed-in players rank by their permanent account Elo; otherwise the
+  // on-device Battle Rank is shown.
+  const myElo = user && profile ? profile.elo : career.elo;
+  const myGames = user && profile ? (profile.wins ?? 0) + (profile.losses ?? 0) : career.games;
+  const myRow = {
+    elo: myElo,
+    wins: user && profile ? profile.wins ?? 0 : career.wins,
+    losses: user && profile ? profile.losses ?? 0 : career.losses,
+    best: user && profile ? profile.best_elo ?? myElo : career.best,
+  };
+  const careerRank = rankFor(myElo);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -33,42 +57,44 @@ export default function Leaderboard() {
         </p>
       </div>
 
-      {/* offline battle career (this device) */}
+      {/* your rank — account (permanent) when logged in, else on-device */}
       <section>
         <h2 className="mb-2 font-display text-lg font-bold uppercase tracking-wide text-slate-200">
-          Your Battle Rank
+          Your Rank
         </h2>
         <div className="rounded-2xl border border-line bg-panel p-4">
-          {career.games === 0 ? (
+          {myGames === 0 ? (
             <p className="text-sm text-slate-400">
-              No battles yet. Win Historic and All-Time battles to earn your
-              rank — tougher opponents are worth more.
+              No games yet. Win Draft matches and battles to climb — tougher
+              opponents are worth more.
             </p>
           ) : (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <RankBadge elo={career.elo} size="lg" progress />
+                <RankBadge elo={myElo} size="lg" progress />
               </div>
               <div className="flex gap-5 text-sm tabular-nums">
-                <Stat label="Rating" value={Math.round(career.elo)} accent="text-hoop2" />
-                <Stat label="Won" value={career.wins} accent="text-emerald-400" />
-                <Stat label="Lost" value={career.losses} accent="text-rose-400" />
-                <Stat label="Peak" value={Math.round(career.best)} accent="text-slate-200" />
+                <Stat label="Rating" value={Math.round(myElo)} accent="text-hoop2" />
+                <Stat label="Won" value={myRow.wins} accent="text-emerald-400" />
+                <Stat label="Lost" value={myRow.losses} accent="text-rose-400" />
+                <Stat label="Peak" value={Math.round(myRow.best)} accent="text-slate-200" />
               </div>
             </div>
           )}
           <p className="mt-3 text-[11px] text-slate-500">
-            {careerRank.next
-              ? `Offline career — saved on this device. Historic and All-Time battles both count.`
-              : `Offline career — you've reached the top tier. Legendary.`}
+            {user
+              ? "Saved to your account — follows you across every device."
+              : isSupabaseConfigured
+                ? "Saved on this device. Log in (top-right) to make it permanent and play Draft."
+                : "Saved on this device."}
           </p>
         </div>
       </section>
 
-      {/* online H2H ladder */}
+      {/* global ranked ladder */}
       <section>
         <h2 className="mb-2 font-display text-lg font-bold uppercase tracking-wide text-slate-200">
-          Online H2H Ladder
+          Ranked Ladder
         </h2>
         {error && (
           <div className="rounded-xl border border-line bg-panel p-4 text-sm text-slate-400">
@@ -82,7 +108,7 @@ export default function Leaderboard() {
         )}
         {rows && rows.length === 0 && (
           <div className="rounded-xl border border-line bg-panel p-6 text-center text-sm text-slate-400">
-            No ranked matches yet. Play a head-to-head game to get on the board!
+            No ranked players yet. Win a Draft match to get on the board!
           </div>
         )}
         {rows && rows.length > 0 && (
@@ -100,11 +126,11 @@ export default function Leaderboard() {
               </thead>
               <tbody className="bg-panel">
                 {rows.map((r, i) => (
-                  <tr key={r.name} className="border-t border-line/50">
+                  <tr key={r.username || r.name} className="border-t border-line/50">
                     <td className="px-3 py-2 font-bold text-slate-500">
                       {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                     </td>
-                    <td className="px-3 py-2 font-semibold">{r.name}</td>
+                    <td className="px-3 py-2 font-semibold">{r.username || r.name}</td>
                     <td className="px-3 py-2">
                       <RankBadge elo={r.elo} size="sm" />
                     </td>

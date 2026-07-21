@@ -90,6 +90,21 @@ export default function Home({ navigate }) {
           </p>
         </button>
         <button
+          onClick={() => navigate("/draft")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98] sm:col-span-2"
+          style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">🎯</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-hoop2">
+            Draft <span className="text-hoop">· Online</span>
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Create a room, share the code. Fifteen stars spawn in and you snake-draft
+            five apiece — pick 2 & 3 go to whoever's second, so nobody's punished for
+            drawing the back end. Sim it out; the winner climbs the ranked ladder.
+          </p>
+        </button>
+        <button
           onClick={() => navigate("/battle/historic")}
           className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98]"
           style={{ animationDelay: "160ms", animationFillMode: "backwards" }}
