@@ -3,8 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 // Configured via Vercel env vars (Settings → Environment Variables):
 //   VITE_SUPABASE_URL       = https://<project>.supabase.co
 //   VITE_SUPABASE_ANON_KEY  = <the project's anon/public key>
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Trim whitespace and any trailing slash — a stray "/" turns auth calls into
+// "…supabase.co//auth/v1/signup", which the gateway rejects as an invalid path.
+const url = (import.meta.env.VITE_SUPABASE_URL || "").trim().replace(/\/+$/, "");
+const anonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || "").trim();
 
 export const isSupabaseConfigured = Boolean(url && anonKey);
 
