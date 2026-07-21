@@ -1,6 +1,6 @@
 import { useState } from "react";
 import GradeBadge from "./GradeBadge.jsx";
-import CourtBoard from "./CourtBoard.jsx";
+import FullCourt from "./FullCourt.jsx";
 import Confetti from "./Confetti.jsx";
 import RankBadge from "./RankBadge.jsx";
 import { apiPost } from "../lib/api.js";
@@ -87,31 +87,36 @@ export default function H2HCompare({ payload, youId, players, onRematch, readOnl
         </div>
       </div>
 
-      {/* side-by-side seasons + rosters */}
+      {/* season records side by side */}
       <div className="grid gap-4 sm:grid-cols-2">
         {[
           { id: idA, name: nameA, season: seasonA, accent: "#38bdf8" },
           { id: idB, name: nameB, season: seasonB, accent: "#fb7185" },
         ].map(({ id, name, season, accent }) => (
-          <div key={id} className="space-y-3">
-            <div className="flex items-center gap-3 rounded-2xl border border-line bg-panel p-3">
-              <GradeBadge grade={season.grade} size="sm" />
-              <div className="min-w-0">
-                <div className="truncate text-sm font-bold" style={{ color: accent }}>
-                  {name} {id === r.winnerId && "👑"}
-                </div>
-                <div className="text-xl font-black tabular-nums">
-                  {season.wins}-{season.losses}
-                </div>
-                <div className="text-[10px] text-slate-500">
-                  overall {season.overall}
-                </div>
+          <div key={id} className="flex items-center gap-3 rounded-2xl border border-line bg-panel p-3">
+            <GradeBadge grade={season.grade} size="sm" />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-bold" style={{ color: accent }}>
+                {name} {id === r.winnerId && "👑"}
               </div>
+              <div className="text-xl font-black tabular-nums">
+                {season.wins}-{season.losses}
+              </div>
+              <div className="text-[10px] text-slate-500">overall {season.overall}</div>
             </div>
-            <CourtBoard roster={r.rosters[id]} compact accent={accent} />
           </div>
         ))}
       </div>
+
+      {/* both squads on one full court */}
+      <FullCourt
+        teamA={r.rosters[idA]}
+        teamB={r.rosters[idB]}
+        nameA={nameA}
+        nameB={nameB}
+        accentA="#38bdf8"
+        accentB="#fb7185"
+      />
 
       {/* stat edges */}
       <div className="rounded-2xl border border-line bg-panel p-4">
