@@ -9,6 +9,7 @@ import { supabase, isSupabaseConfigured } from "../lib/supabase.js";
 export default function Leaderboard() {
   const { user, profile } = useAuth();
   const [rows, setRows] = useState(null);
+  const [packRows, setPackRows] = useState(null);
   const [error, setError] = useState(null);
   const [career] = useState(() => getCareer());
 
@@ -22,6 +23,11 @@ export default function Leaderboard() {
           if (err) setError("Couldn't load the ranked ladder.");
           else setRows(data || []);
         });
+      supabase
+        .from("pack_leaderboard")
+        .select("*")
+        .limit(25)
+        .then(({ data }) => setPackRows(data || []));
       return;
     }
     apiGet("/leaderboard")
@@ -150,6 +156,39 @@ export default function Leaderboard() {
           </div>
         )}
       </section>
+
+      {/* pack & play — best team overalls */}
+      {packRows && packRows.length > 0 && (
+        <section>
+          <h2 className="mb-2 font-display text-lg font-bold uppercase tracking-wide text-slate-200">
+            🎁 Pack &amp; Play · Best Overalls
+          </h2>
+          <div className="overflow-hidden rounded-2xl border border-line">
+            <table className="w-full text-sm">
+              <thead className="bg-panel2 text-left text-xs uppercase tracking-wider text-slate-400">
+                <tr>
+                  <th className="px-3 py-2">#</th>
+                  <th className="px-3 py-2">Player</th>
+                  <th className="px-3 py-2 text-right">Best Overall</th>
+                </tr>
+              </thead>
+              <tbody className="bg-panel">
+                {packRows.map((r, i) => (
+                  <tr key={r.username} className="border-t border-line/50">
+                    <td className="px-3 py-2 font-bold text-slate-500">
+                      {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                    </td>
+                    <td className="px-3 py-2 font-semibold">{r.username}</td>
+                    <td className="px-3 py-2 text-right font-black tabular-nums text-hoop2">
+                      {r.pack_best}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* the tier ladder */}
       <section>

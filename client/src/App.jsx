@@ -4,6 +4,7 @@ import SoloGame from "./screens/SoloGame.jsx";
 import H2HGame from "./screens/H2HGame.jsx";
 import BattleGame from "./screens/BattleGame.jsx";
 import DraftGame from "./screens/DraftGame.jsx";
+import PackGame from "./screens/PackGame.jsx";
 import Leaderboard from "./screens/Leaderboard.jsx";
 import SharedResult from "./screens/SharedResult.jsx";
 import Account from "./screens/Account.jsx";
@@ -19,6 +20,7 @@ export default function App() {
   else if (page === "solo") screen = <SoloGame />;
   else if (page === "h2h") screen = <H2HGame inviteCode={param} />;
   else if (page === "draft") screen = <DraftGame code={param} navigate={navigate} />;
+  else if (page === "packs") screen = <PackGame navigate={navigate} />;
   else if (page === "battle")
     screen = <BattleGame key={param || "pick"} mode={param} navigate={navigate} />;
   else if (page === "leaderboard") screen = <Leaderboard />;

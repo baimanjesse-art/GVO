@@ -282,3 +282,30 @@ create or replace view public.leaderboard as
   from public.profiles
   where username is not null
   order by elo desc;
+
+-- ---------------------------------------------------------------------------
+-- 5) PACK & PLAY — best team overall (offline mode). Its own leaderboard,
+--    separate from Elo: it tracks the single highest-overall five you've built
+--    from packs. record_pack_score keeps only your best.
+-- ---------------------------------------------------------------------------
+alter table public.profiles add column if not exists pack_best integer not null default 0;
+
+create or replace function public.record_pack_score(p_overall numeric)
+returns public.profiles language plpgsql security definer set search_path = public as $$
+declare me public.profiles;
+begin
+  update public.profiles
+     set pack_best = greatest(pack_best, round(p_overall)), updated_at = now()
+   where id = auth.uid()
+   returning * into me;
+  if not found then raise exception 'No profile'; end if;
+  return me;
+end; $$;
+
+grant execute on function public.record_pack_score(numeric) to authenticated;
+
+create or replace view public.pack_leaderboard as
+  select username, pack_best
+  from public.profiles
+  where username is not null and pack_best > 0
+  order by pack_best desc;
