@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { spinWheel, decadeSpin, eraLineupSpin, POOLS } from "../../../shared/players.js";
 import {
   bestLineup,
@@ -58,6 +58,17 @@ function Battle({ mode }) {
 
   const picksMade = POSITIONS.filter((p) => roster[p]).length;
   const rosterFull = picksMade === ROUNDS;
+
+  // After locking a player into a slot, scroll back up to the spin button.
+  const topRef = useRef(null);
+  const prevPicksRef = useRef(picksMade);
+  useEffect(() => {
+    if (picksMade > prevPicksRef.current && topRef.current) {
+      const rect = topRef.current.getBoundingClientRect();
+      if (rect.top < 0) topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    prevPicksRef.current = picksMade;
+  }, [picksMade]);
 
   const takenNames = useMemo(() => {
     const yours = POSITIONS.map((p) => roster[p]?.name).filter(Boolean);
@@ -259,7 +270,7 @@ function Battle({ mode }) {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-4 flex items-center justify-between">
+      <div ref={topRef} className="mb-4 flex scroll-mt-20 items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide sm:text-3xl">
             {title}

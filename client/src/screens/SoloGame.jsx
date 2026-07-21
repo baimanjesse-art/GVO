@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { spinWheel, respinSpin, canRespin } from "../../../shared/players.js";
 import { simulateSeason, bestPick, makeRng } from "../../../shared/sim.js";
 import { POSITIONS, ROUNDS, teamMeta } from "../../../shared/constants.js";
@@ -27,6 +27,18 @@ export default function SoloGame() {
 
   const picksMade = POSITIONS.filter((p) => roster[p]).length;
   const rosterFull = picksMade === ROUNDS;
+
+  // After a player is locked into a slot, scroll back up to the spin button
+  // (mirrors the auto-scroll-to-court when a player is selected).
+  const topRef = useRef(null);
+  const prevPicksRef = useRef(picksMade);
+  useEffect(() => {
+    if (picksMade > prevPicksRef.current && topRef.current) {
+      const rect = topRef.current.getBoundingClientRect();
+      if (rect.top < 0) topRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    prevPicksRef.current = picksMade;
+  }, [picksMade]);
 
   const takenNames = useMemo(
     () => POSITIONS.map((p) => roster[p]?.name).filter(Boolean),
@@ -144,7 +156,7 @@ export default function SoloGame() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-4 flex items-center justify-between">
+      <div ref={topRef} className="mb-4 flex scroll-mt-20 items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide sm:text-3xl">
             Solo Draft
