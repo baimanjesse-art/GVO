@@ -14,7 +14,7 @@ import { POSITIONS, ROUNDS, teamMeta } from "../../../shared/constants.js";
 import { randomLegend } from "../../../shared/legends.js";
 import SpinReel from "../components/SpinReel.jsx";
 import PlayerCard from "../components/PlayerCard.jsx";
-import CourtBoard from "../components/CourtBoard.jsx";
+import FullCourt from "../components/FullCourt.jsx";
 import H2HCompare from "../components/H2HCompare.jsx";
 import RankBadge from "../components/RankBadge.jsx";
 import { recordBattle } from "../lib/career.js";
@@ -290,7 +290,7 @@ function Battle({ mode }) {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_330px]">
+      <div className="space-y-4">
         <div className="space-y-4">
           {phase === "scout" && (
             <button
@@ -425,47 +425,49 @@ function Battle({ mode }) {
           )}
         </div>
 
-        <div className="space-y-4">
-          {opponent && (
-            <div className="animate-pop space-y-2">
-              <div
-                className="rounded-2xl border p-3"
-                style={{ borderColor: opponent.color, background: `${opponent.color}14` }}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
-                      Your opponent
-                    </div>
-                    <div className="font-display text-lg font-bold uppercase leading-tight tracking-wide">
-                      {opponent.name}
-                    </div>
+        {opponent && (
+          <div className="animate-pop space-y-2">
+            <div
+              className="rounded-2xl border p-3"
+              style={{ borderColor: opponent.color, background: `${opponent.color}14` }}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                    Your opponent
                   </div>
-                  <span
-                    className="flex-none rounded-lg px-2 py-1 font-display text-sm font-bold text-white/95"
-                    style={{ background: opponent.color }}
-                  >
-                    {opponent.record || opponent.sub}
-                  </span>
+                  <div className="font-display text-lg font-bold uppercase leading-tight tracking-wide">
+                    {opponent.name}
+                  </div>
                 </div>
-                {opponent.tagline && (
-                  <p className="mt-1 text-xs text-slate-400">{opponent.tagline}</p>
-                )}
+                <span
+                  className="flex-none rounded-lg px-2 py-1 font-display text-sm font-bold text-white/95"
+                  style={{ background: opponent.color }}
+                >
+                  {opponent.record || opponent.sub}
+                </span>
               </div>
-              <CourtBoard roster={opponent.roster} compact accent={opponent.color} />
+              {opponent.tagline && (
+                <p className="mt-1 text-xs text-slate-400">{opponent.tagline}</p>
+              )}
             </div>
-          )}
-
-          <CourtBoard
-            roster={roster}
-            placing={phase === "picking" ? selected : null}
-            onPlace={handlePlace}
-            onSwap={handleSwap}
-            strictFit={strict}
-            onlySlots={selectedSlot ? [selectedSlot] : null}
-            title="Your Squad"
-          />
-        </div>
+            <FullCourt
+              teamA={opponent.roster}
+              nameA={opponent.name}
+              accentA={opponent.color}
+              teamB={roster}
+              nameB="Your Squad"
+              accentB="#f97316"
+              interactiveB={{
+                placing: phase === "picking" ? selected : null,
+                onPlace: handlePlace,
+                onSwap: handleSwap,
+                strictFit: strict,
+                onlySlots: selectedSlot ? [selectedSlot] : null,
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
