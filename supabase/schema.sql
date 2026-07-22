@@ -309,3 +309,120 @@ create or replace view public.pack_leaderboard as
   from public.profiles
   where username is not null and pack_best > 0
   order by pack_best desc;
+
+-- ---------------------------------------------------------------------------
+-- 6) ONLINE PACK VERSUS — two players each open their own packs blind, submit
+--    a five, then face off. Winner gains Elo (same account rank as Draft).
+-- ---------------------------------------------------------------------------
+create table if not exists public.pack_rooms (
+  code          text primary key,
+  host          uuid references auth.users(id) on delete cascade,
+  guest         uuid references auth.users(id) on delete set null,
+  host_name     text,
+  guest_name    text,
+  status        text not null default 'lobby',   -- lobby | building | done
+  seed          bigint,
+  host_upgraded text,
+  guest_upgraded text,
+  host_roster   jsonb,
+  guest_roster  jsonb,
+  result        jsonb,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now()
+);
+
+alter table public.pack_rooms enable row level security;
+drop policy if exists "pack rooms readable" on public.pack_rooms;
+create policy "pack rooms readable" on public.pack_rooms for select to authenticated using (true);
+revoke insert, update, delete on public.pack_rooms from authenticated, anon;
+alter publication supabase_realtime add table public.pack_rooms;
+
+create or replace function public.create_pack_room(p_host_name text)
+returns text language plpgsql security definer set search_path = public as $$
+declare
+  chars text := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  new_code text; i int;
+begin
+  loop
+    new_code := '';
+    for i in 1..4 loop
+      new_code := new_code || substr(chars, floor(random()*length(chars))::int + 1, 1);
+    end loop;
+    exit when not exists (select 1 from public.pack_rooms where code = new_code);
+  end loop;
+  insert into public.pack_rooms (code, host, host_name, seed)
+  values (new_code, auth.uid(), p_host_name, (random()*2147483647)::bigint);
+  return new_code;
+end; $$;
+
+create or replace function public.join_pack_room(room_code text, p_guest_name text)
+returns public.pack_rooms language plpgsql security definer set search_path = public as $$
+declare r public.pack_rooms;
+begin
+  select * into r from public.pack_rooms where code = room_code for update;
+  if not found then raise exception 'Room not found'; end if;
+  if r.status <> 'lobby' then raise exception 'Match already started'; end if;
+  if r.host = auth.uid() then raise exception 'You are already the host'; end if;
+  if r.guest is not null then raise exception 'Room is full'; end if;
+  update public.pack_rooms
+     set guest = auth.uid(), guest_name = p_guest_name, status = 'building', updated_at = now()
+   where code = room_code returning * into r;
+  return r;
+end; $$;
+
+-- Submit your finished five (and which pack you upgraded).
+create or replace function public.submit_pack_team(room_code text, p_upgraded text, p_roster jsonb)
+returns public.pack_rooms language plpgsql security definer set search_path = public as $$
+declare r public.pack_rooms;
+begin
+  select * into r from public.pack_rooms where code = room_code for update;
+  if not found then raise exception 'Room not found'; end if;
+  if auth.uid() = r.host then
+    update public.pack_rooms set host_upgraded = p_upgraded, host_roster = p_roster, updated_at = now()
+      where code = room_code returning * into r;
+  elsif auth.uid() = r.guest then
+    update public.pack_rooms set guest_upgraded = p_upgraded, guest_roster = p_roster, updated_at = now()
+      where code = room_code returning * into r;
+  else
+    raise exception 'You are not in this room';
+  end if;
+  return r;
+end; $$;
+
+-- Host finalizes once both teams are in: winner (0=host,1=guest) gains Elo.
+create or replace function public.finish_pack(room_code text, winner int, p_result jsonb)
+returns public.pack_rooms language plpgsql security definer set search_path = public as $$
+declare
+  r public.pack_rooms;
+  w uuid; l uuid; w_elo int; l_elo int; expected numeric; gain int;
+begin
+  select * into r from public.pack_rooms where code = room_code for update;
+  if not found then raise exception 'Room not found'; end if;
+  if r.status = 'done' then return r; end if;
+  if r.host_roster is null or r.guest_roster is null then raise exception 'Both teams not in yet'; end if;
+  if auth.uid() not in (r.host, r.guest) then raise exception 'Not in this room'; end if;
+  if winner not in (0,1) then raise exception 'Bad winner'; end if;
+
+  w := case when winner = 0 then r.host else r.guest end;
+  l := case when winner = 0 then r.guest else r.host end;
+  select elo into w_elo from public.profiles where id = w;
+  select elo into l_elo from public.profiles where id = l;
+  expected := 1.0 / (1.0 + power(10, (l_elo - w_elo) / 400.0));
+  gain := round(32 * (1 - expected));
+
+  update public.profiles set elo = elo + gain, best_elo = greatest(best_elo, elo + gain),
+         wins = wins + 1, updated_at = now() where id = w;
+  update public.profiles set losses = losses + 1, updated_at = now() where id = l;
+
+  update public.pack_rooms
+     set status = 'done', result = jsonb_set(coalesce(p_result,'{}'::jsonb), '{eloGain}', to_jsonb(gain)), updated_at = now()
+   where code = room_code returning * into r;
+  return r;
+end; $$;
+
+grant execute on function
+  public.create_pack_room(text),
+  public.join_pack_room(text, text),
+  public.submit_pack_team(text, text, jsonb),
+  public.finish_pack(text, int, jsonb)
+to authenticated;
