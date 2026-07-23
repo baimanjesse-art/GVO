@@ -31,8 +31,10 @@ const pct = (x) => Math.round(clamp01(x) * 100);
 // Team evaluation
 // ---------------------------------------------------------------------------
 
-// Penalty for playing a player N spots away from his natural position.
-const OOP_PENALTY = [0, 6, 14, 22, 30];
+// Penalty for playing a player N spots away from his natural position. Playing
+// out of position is punished hard — a wing at center or a big at the point
+// bleeds real efficiency, so the drop-off steepens with every spot.
+const OOP_PENALTY = [0, 9, 24, 40, 56];
 
 const STAR_WEIGHTS = [0.26, 0.23, 0.2, 0.17, 0.14];
 

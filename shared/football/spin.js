@@ -7,8 +7,9 @@ import { fitDistance } from "./sim.js";
 // Solo flow can drive either sport from one code path.
 
 // Penalty (rating points) for slotting a player N steps from his natural spot.
-// Mirrors the fit penalties inside evaluateTeam: 0 natural, 8 stretch, 26 OOP.
-const OOP_PENALTY = [0, 8, 26];
+// Mirrors the fit penalties inside evaluateTeam: 0 natural, 13 stretch, 44 OOP —
+// so the best-fit helper steers hard away from out-of-position lineups.
+const OOP_PENALTY = [0, 13, 44];
 
 /**
  * Spin the wheel: land on a random decade+team pool, skipping used pools and

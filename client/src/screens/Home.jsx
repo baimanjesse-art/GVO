@@ -316,7 +316,7 @@ function FootballHome({ navigate, marquee }) {
 
         <button
           onClick={() => navigate("/packs")}
-          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] sm:col-span-2"
           style={{ animationDelay: "200ms", animationFillMode: "backwards" }}
         >
           <div className="text-3xl">🎁</div>

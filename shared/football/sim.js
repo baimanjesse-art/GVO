@@ -104,10 +104,14 @@ export function evaluateTeam(roster) {
     if (!p) continue;
     const d = fitDistance(p, slot);
     if (d === 1) {
-      fitPenalty += 8;
+      // a skill player at the wrong skill spot (RB split wide, WR in the slot
+      // he can't run) — a real but survivable stretch
+      fitPenalty += 13;
       oopDetails.push({ slot, name: p.name, kind: "stretch" });
     } else if (d === 2) {
-      fitPenalty += 26;
+      // a QB lined up at receiver, or a non-QB taking snaps under center — a
+      // scheme disaster, punished hard
+      fitPenalty += 44;
       oopDetails.push({ slot, name: p.name, kind: "oop" });
     }
   }

@@ -96,12 +96,14 @@ test("evaluateTeam grades a loaded roster highly and reacts to the QB", () => {
   assert.ok(evWeak.components.passing < ev.components.passing, "passing should fall with the QB");
 });
 
-test("a QB stuck at WR is penalized on scheme fit", () => {
+test("a QB stuck at WR is penalized hard on scheme fit", () => {
   const roster = starterRoster();
   const good = evaluateTeam(roster).components.fit;
   const broken = { ...roster, WR3: roster.QB, QB: { name: "Backup", position: "QB", rating: 70, team: "X", decade: "2020s" } };
   const bad = evaluateTeam(broken).components.fit;
   assert.ok(bad < good, "a QB out at WR should hurt fit");
+  // out-of-position is a scheme disaster, not a nick — the fit drop is steep
+  assert.ok(good - bad >= 30, `an OOP QB should tank fit hard, only dropped ${good - bad}`);
 });
 
 test("season sim returns 0..17 wins and a grade; a perfect year is possible but rare", () => {
