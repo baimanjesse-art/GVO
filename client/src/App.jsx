@@ -30,7 +30,7 @@ export default function App() {
       param === "versus" ? (
         <PackVersus code={segments[2]} navigate={navigate} />
       ) : (
-        <PackGame navigate={navigate} />
+        <PackGame key={sportId} navigate={navigate} />
       );
   else if (page === "battle")
     screen = <BattleGame key={`${sportId}:${param || "pick"}`} mode={param} navigate={navigate} />;
@@ -78,6 +78,12 @@ export default function App() {
               <span className="sm:hidden">⚔️</span>
               <span className="hidden sm:inline">Battles</span>
             </NavBtn>
+            {isFootball && (
+              <NavBtn onClick={() => navigate("/packs")} active={page === "packs"}>
+                <span className="sm:hidden">🎁</span>
+                <span className="hidden sm:inline">Packs</span>
+              </NavBtn>
+            )}
             {!isFootball && (
               <NavBtn
                 onClick={() => navigate("/leaderboard")}

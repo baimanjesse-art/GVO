@@ -13,6 +13,7 @@ import {
 } from "../shared/football/sim.js";
 import { spinWheel, respinSpin, canRespin, bestPick, eraLineupSpin, decadeSpin } from "../shared/football/spin.js";
 import { LEGENDS, randomLegend } from "../shared/football/legends.js";
+import { dealPacks, PACK_SIZE, PREMIUM_FLOOR, ELITE_FLOOR } from "../shared/football/packs.js";
 
 test("roster is 7 slots incl a FLEX that takes RB/WR/TE", () => {
   assert.equal(SLOTS.length, 7);
@@ -176,6 +177,27 @@ test("decadeSpin stays inside its decade and can require open-slot fits", () => 
   // require a pool that can fill a QB naturally
   const qbSpin = decadeSpin({ decade: "1990s", openSlots: ["QB"], rng: makeRng(7) });
   assert.ok(qbSpin.players.some((p) => p.position === "QB"), "openSlots QB filter yields a QB");
+});
+
+test("pack & play deals one pack per slot, premium is 88+/90+, no dupes", () => {
+  const packs = dealPacks({ upgraded: "WR1" });
+  assert.deepEqual(Object.keys(packs).sort(), [...SLOTS].sort());
+
+  const seen = new Set();
+  for (const slot of SLOTS) {
+    const pack = packs[slot];
+    assert.equal(pack.length, PACK_SIZE, `${slot} pack should have ${PACK_SIZE}`);
+    for (const p of pack) {
+      assert.ok(SLOT_ELIGIBLE[slot].includes(p.position), `${p.name} can't fill ${slot}`);
+      assert.ok(!seen.has(p.name), `${p.name} appeared in two packs`);
+      seen.add(p.name);
+    }
+  }
+  // the upgraded pack: all 88+ (subject to floor relaxation only if truly thin)
+  // and, for WR where the pool is deep, at least one 90+.
+  const premium = packs.WR1;
+  assert.ok(premium.every((p) => p.rating >= PREMIUM_FLOOR), "premium WR pack should be all 88+");
+  assert.ok(premium.some((p) => p.rating >= ELITE_FLOOR), "premium WR pack should include a 90+");
 });
 
 test("head-to-head produces one football-scored game and a winner", () => {

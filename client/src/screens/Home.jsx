@@ -282,15 +282,31 @@ function FootballHome({ navigate, marquee }) {
           </p>
         </button>
 
-        <div className="animate-slide-up rounded-2xl border border-dashed border-line bg-panel/50 p-6 text-left sm:col-span-2" style={{ animationDelay: "140ms", animationFillMode: "backwards" }}>
-          <div className="text-3xl">🚧</div>
-          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-slate-300">
-            More Modes Coming
+        <button
+          onClick={() => navigate("/packs")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] sm:col-span-2"
+          style={{ animationDelay: "140ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">🎁</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
+            Pack &amp; Play
           </div>
           <p className="mt-1 text-sm text-slate-400">
-            Online head-to-head, snake draft and pack &amp; play are next up for
-            football. For now, run Solo or take on an All-Time squad — or flip
-            back to Basketball up top for the full slate.
+            Seven packs, one per roster slot — each deals five 80+ players.
+            Upgrade one slot to a pack of 88+ (with a 90+ inside), take one from
+            each, and chase the highest team overall.
+          </p>
+        </button>
+
+        <div className="animate-slide-up rounded-2xl border border-dashed border-line bg-panel/50 p-6 text-left sm:col-span-2" style={{ animationDelay: "200ms", animationFillMode: "backwards" }}>
+          <div className="text-3xl">🚧</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-slate-300">
+            Online Modes Coming
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Online head-to-head, snake draft and pack versus are next up for
+            football. For now, everything here is single-player — or flip back to
+            Basketball up top for the online slate.
           </p>
         </div>
       </div>

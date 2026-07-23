@@ -7,6 +7,7 @@ import * as bballConst from "../../../shared/constants.js";
 import * as bballSim from "../../../shared/sim.js";
 import * as bballSpin from "../../../shared/players.js";
 import { randomLegend as bballRandomLegend } from "../../../shared/legends.js";
+import { dealPacks as bballDealPacks } from "../../../shared/packs.js";
 import { encodeSolo } from "./shareCode.js";
 import CourtBoard from "../components/CourtBoard.jsx";
 import FullCourt from "../components/FullCourt.jsx";
@@ -16,6 +17,7 @@ import * as fbSim from "../../../shared/football/sim.js";
 import * as fbSpin from "../../../shared/football/spin.js";
 import * as fbPlayers from "../../../shared/football/players.js";
 import { randomLegend as fbRandomLegend } from "../../../shared/football/legends.js";
+import { dealPacks as fbDealPacks } from "../../../shared/football/packs.js";
 import FieldBoard from "../components/FieldBoard.jsx";
 import FieldVersus from "../components/FieldVersus.jsx";
 
@@ -66,6 +68,17 @@ const basketball = {
   supportsHistoric: true,
   supportsAllTime: true,
   seriesLabel: "best-of-7",
+  // pack & play
+  dealPacks: (opts) => bballDealPacks({ upgradedPosition: opts.upgraded, rng: opts.rng }),
+  packSlotName: {
+    PG: "Point Guard",
+    SG: "Shooting Guard",
+    SF: "Small Forward",
+    PF: "Power Forward",
+    C: "Center",
+  },
+  packBestKey: "arena-pack-best",
+  supportsPackOnline: true,
   // season framing
   seasonGames: 82,
   seasonLabel: "82-game season",
@@ -111,6 +124,18 @@ const football = {
   supportsHistoric: false,
   supportsAllTime: true,
   seriesLabel: "single game",
+  dealPacks: (opts) => fbDealPacks({ upgraded: opts.upgraded, rng: opts.rng }),
+  packSlotName: {
+    QB: "Quarterback",
+    RB: "Running Back",
+    WR1: "Wide Receiver",
+    WR2: "Wide Receiver",
+    WR3: "Wide Receiver",
+    TE: "Tight End",
+    FLEX: "Flex · RB/WR/TE",
+  },
+  packBestKey: "arena-pack-best-football",
+  supportsPackOnline: false,
   seasonGames: 17,
   seasonLabel: "17-game season",
   simCta: "Sim the 17-game season",

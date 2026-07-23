@@ -1,36 +1,34 @@
 import { useState } from "react";
-import { dealPacks, PACK_SIZE } from "../../../shared/packs.js";
-import { POSITIONS, teamMeta } from "../../../shared/constants.js";
+import { getSport } from "../lib/sports.js";
 import PlayerCard from "./PlayerCard.jsx";
 import PlayerPhoto from "./PlayerPhoto.jsx";
+import { teamMetaAny as teamMeta } from "../lib/teamColors.js";
 
 /**
- * The pack-building flow, shared by offline Pack & Play and online Pack Versus:
- * choose one position to upgrade, open all five packs, take one from each, then
- * confirm. Calls `onComplete(upgradedPosition, roster)` with the finished five.
+ * The pack-building flow, shared by offline Pack & Play and online Pack Versus,
+ * for either sport: choose one slot to upgrade, open all packs (one per roster
+ * slot), take one from each, then confirm. Calls `onComplete(upgradedSlot,
+ * roster)` with the finished squad.
  */
-export const SPOT_LABEL = {
-  PG: "Point Guard",
-  SG: "Shooting Guard",
-  SF: "Small Forward",
-  PF: "Power Forward",
-  C: "Center",
-};
-const EMPTY = { PG: null, SG: null, SF: null, PF: null, C: null };
+export default function PackBuilder({ onComplete, confirmLabel = "🏀 Reveal my team", busy, intro, sport }) {
+  const cfg = sport || getSport("basketball");
+  const SLOTS = cfg.slots;
+  const slotName = cfg.packSlotName;
+  const EMPTY = cfg.emptyRoster();
+  const packGridCols = SLOTS.length <= 5 ? "lg:grid-cols-5" : "lg:grid-cols-4";
 
-export default function PackBuilder({ onComplete, confirmLabel = "🏀 Reveal my team", busy, intro }) {
   const [phase, setPhase] = useState("setup"); // setup | packs
   const [upgraded, setUpgraded] = useState(null);
   const [packs, setPacks] = useState(null);
   const [roster, setRoster] = useState(EMPTY);
   const [openPos, setOpenPos] = useState(null);
 
-  const picked = POSITIONS.filter((p) => roster[p]).length;
-  const allPicked = picked === PACK_SIZE;
+  const picked = SLOTS.filter((p) => roster[p]).length;
+  const allPicked = picked === SLOTS.length;
 
   function startPacks(pos) {
     setUpgraded(pos);
-    setPacks(dealPacks({ upgradedPosition: pos }));
+    setPacks(cfg.dealPacks({ upgraded: pos, rng: Math.random }));
     setRoster(EMPTY);
     setOpenPos(null);
     setPhase("packs");
@@ -45,18 +43,18 @@ export default function PackBuilder({ onComplete, confirmLabel = "🏀 Reveal my
           Choose your premium pack
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {POSITIONS.map((pos) => (
+          {SLOTS.map((pos) => (
             <button
               key={pos}
               onClick={() => startPacks(pos)}
               className="group flex items-center gap-3 rounded-2xl border border-line bg-panel p-4 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 active:scale-[0.98]"
             >
-              <span className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 font-display text-xl font-black text-black">
+              <span className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 font-display text-lg font-black text-black">
                 {pos}
               </span>
               <div>
                 <div className="font-display text-base font-bold uppercase tracking-wide group-hover:text-hoop2">
-                  {SPOT_LABEL[pos]}
+                  {slotName[pos]}
                 </div>
                 <div className="text-xs text-slate-500">Upgrade this pack → 88+ / 90+</div>
               </div>
@@ -72,10 +70,10 @@ export default function PackBuilder({ onComplete, confirmLabel = "🏀 Reveal my
     <div>
       <div className="mb-3 flex items-center justify-between">
         <p className="text-xs text-slate-400">
-          Open each pack and take one player. Premium: <span className="text-hoop2">{SPOT_LABEL[upgraded]}</span>.
+          Open each pack and take one player. Premium: <span className="text-hoop2">{slotName[upgraded]}</span>.
         </p>
         <div className="text-right font-display text-sm font-bold text-slate-400">
-          {picked}/{PACK_SIZE} picked
+          {picked}/{SLOTS.length} picked
         </div>
       </div>
 
@@ -92,11 +90,12 @@ export default function PackBuilder({ onComplete, confirmLabel = "🏀 Reveal my
         />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {POSITIONS.map((pos) => (
+          <div className={`grid grid-cols-2 gap-3 sm:grid-cols-3 ${packGridCols}`}>
+            {SLOTS.map((pos) => (
               <PackTile
                 key={pos}
                 pos={pos}
+                label={cfg.slotLabel(pos)}
                 premium={pos === upgraded}
                 picked={roster[pos]}
                 onOpen={() => setOpenPos(pos)}
