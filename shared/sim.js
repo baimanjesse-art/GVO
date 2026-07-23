@@ -248,6 +248,11 @@ export function winProbability(overall) {
   return 1 / (1 + Math.exp(-(overall - 52) / 14));
 }
 
+// A truly complete roster is untouchable: at this team overall or above, the
+// season is a guaranteed run to perfection (82-0). Below it, every game is a
+// real coin toss weighted by talent.
+export const GUARANTEED_OVERALL = 97;
+
 export function gradeForWins(wins) {
   if (wins === 82) return "82-0";
   if (wins >= 75) return "S+";
@@ -272,6 +277,20 @@ export function gradeForWins(wins) {
 export function simulateSeason(roster, rng = Math.random) {
   const evaluation = evaluateTeam(roster);
   const { overall } = evaluation;
+
+  // An elite-enough roster is guaranteed the perfect season.
+  if (overall >= GUARANTEED_OVERALL) {
+    return {
+      ...evaluation,
+      wins: 82,
+      losses: 0,
+      games: new Array(82).fill(true),
+      expectedWins: 82,
+      bestStreak: 82,
+      worstSkid: 0,
+      grade: gradeForWins(82),
+    };
+  }
 
   let wins = 0;
   let streak = 0;

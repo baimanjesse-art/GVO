@@ -25,6 +25,14 @@ export default function SoloGame() {
   const picksMade = SLOTS.filter((s) => roster[s]).length;
   const rosterFull = picksMade === ROUNDS;
 
+  // Preview the finished squad's overall so you can see whether you've cleared
+  // the guaranteed-perfection line (basketball: a 97+ team is a lock for 82-0).
+  const preview = useMemo(
+    () => (rosterFull ? sport.evaluateTeam(roster) : null),
+    [rosterFull, roster, sport]
+  );
+  const guaranteed = Boolean(preview && sport.id === "basketball" && preview.overall >= 97);
+
   // After a player is locked into a slot, scroll back up to the spin button
   // (mirrors the auto-scroll-to-court when a player is selected).
   const topRef = useRef(null);
@@ -200,12 +208,45 @@ export default function SoloGame() {
           )}
 
           {phase === "idle" && rosterFull && (
-            <button
-              onClick={runSeason}
-              className="w-full animate-flash rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 py-5 font-display text-2xl font-bold uppercase tracking-widest text-black transition hover:from-emerald-300 hover:to-emerald-500 active:scale-[0.98]"
-            >
-              🏆 {sport.simCta}
-            </button>
+            <div className="space-y-2">
+              <div
+                className={`flex items-center justify-between rounded-2xl border px-4 py-3 ${
+                  guaranteed
+                    ? "border-amber-400/70 bg-gradient-to-r from-amber-500/15 to-emerald-500/15"
+                    : "border-line bg-panel"
+                }`}
+              >
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+                    Team Overall
+                  </div>
+                  <div className="font-display text-3xl font-black tabular-nums text-hoop2">
+                    {preview.overall}
+                  </div>
+                </div>
+                {guaranteed ? (
+                  <div className="text-right">
+                    <div className="font-display text-sm font-black uppercase tracking-wider text-amber-300">
+                      🔒 Guaranteed 82-0
+                    </div>
+                    <div className="text-[11px] text-slate-400">This squad can't lose. Run it.</div>
+                  </div>
+                ) : (
+                  sport.id === "basketball" && (
+                    <div className="max-w-[55%] text-right text-[11px] text-slate-400">
+                      Hit a <span className="font-bold text-slate-200">97</span> team overall to lock
+                      in a guaranteed 82-0.
+                    </div>
+                  )
+                )}
+              </div>
+              <button
+                onClick={runSeason}
+                className="w-full animate-flash rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 py-5 font-display text-2xl font-bold uppercase tracking-widest text-black transition hover:from-emerald-300 hover:to-emerald-500 active:scale-[0.98]"
+              >
+                🏆 {sport.simCta}
+              </button>
+            </div>
           )}
 
           {phase === "spinning" && (
