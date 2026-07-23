@@ -84,8 +84,20 @@ create policy "rooms readable"
 -- direct insert/update/delete policies are granted to clients.
 revoke insert, update, delete on public.draft_rooms from authenticated, anon;
 
--- Broadcast row changes to both players in real time.
-alter publication supabase_realtime add table public.draft_rooms;
+-- Broadcast row changes to both players in real time. Guarded with a check
+-- against pg_publication_tables — unlike everything else in this script,
+-- "ALTER PUBLICATION ... ADD TABLE" has no IF NOT EXISTS and errors on a
+-- second run, which (since Supabase runs a pasted script as one transaction)
+-- would silently roll back everything below this line on every re-run.
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'draft_rooms'
+  ) then
+    alter publication supabase_realtime add table public.draft_rooms;
+  end if;
+end $$;
 
 -- `pool` is a large JSONB column that Postgres stores out-of-line ("TOASTed").
 -- Updates that don't touch `pool` (e.g. make_pick, which only changes `picks`)
@@ -343,7 +355,15 @@ alter table public.pack_rooms enable row level security;
 drop policy if exists "pack rooms readable" on public.pack_rooms;
 create policy "pack rooms readable" on public.pack_rooms for select to authenticated using (true);
 revoke insert, update, delete on public.pack_rooms from authenticated, anon;
-alter publication supabase_realtime add table public.pack_rooms;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'pack_rooms'
+  ) then
+    alter publication supabase_realtime add table public.pack_rooms;
+  end if;
+end $$;
 
 -- host_roster/guest_roster are large JSONB too — same TOAST fix as draft_rooms.
 alter table public.pack_rooms replica identity full;
