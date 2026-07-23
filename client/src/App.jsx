@@ -28,7 +28,7 @@ export default function App() {
   else if (page === "packs")
     screen =
       param === "versus" ? (
-        <PackVersus code={segments[2]} navigate={navigate} />
+        <PackVersus code={segments[2]} sportParam={segments[3]} navigate={navigate} />
       ) : (
         <PackGame key={sportId} navigate={navigate} />
       );
@@ -68,12 +68,10 @@ export default function App() {
             <NavBtn onClick={() => navigate("/solo")} active={page === "solo"}>
               Solo
             </NavBtn>
-            {!isFootball && (
-              <NavBtn onClick={() => navigate("/draft")} active={page === "draft"}>
-                <span className="sm:hidden">🎯</span>
-                <span className="hidden sm:inline">Draft</span>
-              </NavBtn>
-            )}
+            <NavBtn onClick={() => navigate("/draft")} active={page === "draft"}>
+              <span className="sm:hidden">🎯</span>
+              <span className="hidden sm:inline">Draft</span>
+            </NavBtn>
             <NavBtn onClick={() => navigate("/battle")} active={page === "battle"}>
               <span className="sm:hidden">⚔️</span>
               <span className="hidden sm:inline">Battles</span>

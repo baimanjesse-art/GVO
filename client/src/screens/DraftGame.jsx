@@ -1,24 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../lib/auth.jsx";
+import { useSport } from "../lib/sport.jsx";
+import { sportForPlayer } from "../lib/sports.js";
 import { useDraftRoom } from "../lib/draftRoom.js";
-import {
-  draftPool,
-  rosterFromPicks,
-  whoseTurn,
-  SNAKE_ORDER,
-  TOTAL_PICKS,
-  PICKS_PER_PLAYER,
-} from "../../../shared/draft.js";
-import {
-  evaluateTeam,
-  simulateSeason,
-  simulateSeries,
-  statEdges,
-  makeRng,
-} from "../../../shared/sim.js";
-import { POSITIONS } from "../../../shared/constants.js";
 import PlayerCard from "../components/PlayerCard.jsx";
-import CourtBoard from "../components/CourtBoard.jsx";
 import H2HCompare from "../components/H2HCompare.jsx";
 import RankBadge from "../components/RankBadge.jsx";
 import AuthPanel from "../components/AuthPanel.jsx";
@@ -26,8 +11,14 @@ import { copyText } from "../lib/share.js";
 
 export default function DraftGame({ code: inviteCode, navigate }) {
   const { user, profile, loading, configured, refreshProfile } = useAuth();
+  const activeSport = useSport();
   const draft = useDraftRoom();
   const { room, error, busy } = draft;
+
+  // A room's sport travels in its shared pool (football players carry a single
+  // `position`, basketball a `positions` array). Before the pool exists the
+  // lobby is sport-neutral, so the host's active sport stands in.
+  const sport = room?.pool?.length ? sportForPlayer(room.pool[0]) : activeSport;
 
   const [name, setName] = useState("");
   const [joinCode, setJoinCode] = useState(inviteCode || "");
@@ -46,17 +37,17 @@ export default function DraftGame({ code: inviteCode, navigate }) {
   // ----- gates -----
   if (!configured) {
     return (
-      <Shell>
+      <Shell sport={sport}>
         <AuthPanel />
       </Shell>
     );
   }
   if (loading) {
-    return <Shell><Loading /></Shell>;
+    return <Shell sport={sport}><Loading /></Shell>;
   }
   if (!user) {
     return (
-      <Shell>
+      <Shell sport={sport}>
         <p className="mb-3 text-sm text-slate-400">
           Draft is online only — log in so your wins count toward your rank.
         </p>
@@ -71,7 +62,7 @@ export default function DraftGame({ code: inviteCode, navigate }) {
   // ----- lobby entry (no room yet) -----
   if (!room) {
     return (
-      <Shell>
+      <Shell sport={sport}>
         <div className="space-y-3 rounded-2xl border border-line bg-panel p-4">
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
             Playing as
@@ -121,7 +112,7 @@ export default function DraftGame({ code: inviteCode, navigate }) {
   if (room.status === "lobby") {
     const link = `${location.origin}/#/draft/${room.code}`;
     return (
-      <Shell>
+      <Shell sport={sport}>
         <div className="rounded-2xl border border-line bg-panel p-5 text-center">
           <div className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500">Room code</div>
           <div className="my-2 font-display text-5xl font-black tracking-[0.3em] text-hoop2">
@@ -149,7 +140,7 @@ export default function DraftGame({ code: inviteCode, navigate }) {
               disabled={!room.guest || busy}
               onClick={() => {
                 const seed = Math.floor(Math.random() * 2 ** 31);
-                const pool = draftPool({ rng: Math.random });
+                const pool = sport.draftPool({ rng: Math.random });
                 draft.startDraft(room.code, pool, seed);
               }}
               className="mt-4 w-full rounded-xl bg-hoop py-3 font-black text-black transition hover:bg-hoop2 active:scale-[0.98] disabled:opacity-40"
@@ -171,6 +162,7 @@ export default function DraftGame({ code: inviteCode, navigate }) {
     return (
       <DraftBoard
         room={room}
+        sport={sport}
         yourIndex={yourIndex}
         yourName={yourName}
         oppName={oppName}
@@ -187,6 +179,7 @@ export default function DraftGame({ code: inviteCode, navigate }) {
   return (
     <PlaceAndResult
       room={room}
+      sport={sport}
       yourIndex={yourIndex}
       youAreHost={youAreHost}
       onSubmitRoster={(r) => draft.submitRoster(room.code, r)}
@@ -202,10 +195,10 @@ export default function DraftGame({ code: inviteCode, navigate }) {
 }
 
 // ---------------------------------------------------------------------------
-function DraftBoard({ room, yourIndex, yourName, oppName, onPick, busy, error, clearError, onLeave }) {
+function DraftBoard({ room, sport, yourIndex, yourName, oppName, onPick, busy, error, clearError, onLeave }) {
   const picks = room.picks || [];
   const pickCount = picks.length;
-  const turnIndex = whoseTurn(pickCount);
+  const turnIndex = sport.whoseTurn(pickCount);
   const isMyTurn = turnIndex === yourIndex;
   const taken = useMemo(
     () => new Map(picks.map((p) => [p.player.name, p.by])),
@@ -216,7 +209,7 @@ function DraftBoard({ room, yourIndex, yourName, oppName, onPick, busy, error, c
 
   return (
     <div className="mx-auto max-w-5xl">
-      <Header />
+      <Header sport={sport} />
       <div className="mb-3 flex items-center justify-between rounded-2xl border border-line bg-panel px-4 py-2.5">
         <div className="text-sm">
           <span className="font-display uppercase tracking-wide text-slate-200">{yourName}</span>{" "}
@@ -232,7 +225,7 @@ function DraftBoard({ room, yourIndex, yourName, oppName, onPick, busy, error, c
         </div>
       </div>
 
-      <SnakeTracker order={SNAKE_ORDER} pickCount={pickCount} yourIndex={yourIndex} />
+      <SnakeTracker order={sport.snakeOrder} pickCount={pickCount} yourIndex={yourIndex} />
 
       <div className="mt-3 grid gap-4 lg:grid-cols-[1fr_260px]">
         <div>
@@ -266,8 +259,8 @@ function DraftBoard({ room, yourIndex, yourName, oppName, onPick, busy, error, c
         </div>
 
         <div className="space-y-3">
-          <PickColumn title={`${yourName} (you)`} picks={myPicks} accent="#38bdf8" />
-          <PickColumn title={oppName} picks={oppPicks} accent="#fb7185" />
+          <PickColumn title={`${yourName} (you)`} picks={myPicks} accent="#38bdf8" perPlayer={sport.picksPerPlayer} />
+          <PickColumn title={oppName} picks={oppPicks} accent="#fb7185" perPlayer={sport.picksPerPlayer} />
         </div>
       </div>
       <LeaveBtn onLeave={onLeave} />
@@ -276,7 +269,7 @@ function DraftBoard({ room, yourIndex, yourName, oppName, onPick, busy, error, c
   );
 }
 
-function PickColumn({ title, picks, accent }) {
+function PickColumn({ title, picks, accent, perPlayer }) {
   return (
     <div className="rounded-2xl border border-line bg-panel p-3">
       <div className="mb-2 flex items-center justify-between">
@@ -284,11 +277,11 @@ function PickColumn({ title, picks, accent }) {
           {title}
         </span>
         <span className="text-[10px] uppercase tracking-wider text-slate-500">
-          {picks.length}/{PICKS_PER_PLAYER}
+          {picks.length}/{perPlayer}
         </span>
       </div>
       <div className="space-y-1">
-        {Array.from({ length: PICKS_PER_PLAYER }).map((_, i) => (
+        {Array.from({ length: perPlayer }).map((_, i) => (
           <div key={i} className="flex items-center gap-2 text-xs">
             {picks[i] ? (
               <>
@@ -338,6 +331,7 @@ function SnakeTracker({ order, pickCount, yourIndex }) {
 // ---------------------------------------------------------------------------
 function PlaceAndResult({
   room,
+  sport,
   yourIndex,
   youAreHost,
   onSubmitRoster,
@@ -350,7 +344,7 @@ function PlaceAndResult({
   onLeave,
 }) {
   const myPicks = (room.picks || []).filter((p) => p.by === yourIndex).map((p) => p.player);
-  const [roster, setRoster] = useState(() => rosterFromPicks(myPicks));
+  const [roster, setRoster] = useState(() => sport.rosterFromPicks(myPicks));
   const submittedRef = useRef(false);
   const finishedRef = useRef(false);
 
@@ -362,11 +356,11 @@ function PlaceAndResult({
     if (!bothSubmitted) return null;
     const A = room.host_roster;
     const B = room.guest_roster;
-    const rng = makeRng(Number(room.seed) >>> 0);
-    const evA = evaluateTeam(A);
-    const evB = evaluateTeam(B);
-    const series = simulateSeries(evA, evB, rng);
-    const seasons = { host: simulateSeason(A, rng), guest: simulateSeason(B, rng) };
+    const rng = sport.makeRng(Number(room.seed) >>> 0);
+    const evA = sport.evaluateTeam(A);
+    const evB = sport.evaluateTeam(B);
+    const series = sport.simulateSeries(evA, evB, rng);
+    const seasons = { host: sport.simulateSeason(A, rng), guest: sport.simulateSeason(B, rng) };
     const winnerIndex = series.winner === "A" ? 0 : 1;
     return {
       winnerIndex,
@@ -376,11 +370,11 @@ function PlaceAndResult({
         seasons,
         rosters: { host: A, guest: B },
         series,
-        edges: statEdges(evA, evB),
+        edges: sport.statEdges(evA, evB),
         winnerId: series.winner === "A" ? "host" : "guest",
       },
     };
-  }, [bothSubmitted, room]);
+  }, [bothSubmitted, room, sport]);
 
   // Host finalizes once (writes result + Elo); avoids a double-write race.
   useEffect(() => {
@@ -405,7 +399,7 @@ function PlaceAndResult({
     const eloGain = room.result?.eloGain ?? 0;
     return (
       <div className="mx-auto max-w-3xl space-y-4">
-        <Header />
+        <Header sport={sport} />
         <div
           className={`rounded-2xl border p-4 text-center ${
             youWon ? "border-emerald-500/50 bg-emerald-500/10" : "border-line bg-panel"
@@ -421,7 +415,7 @@ function PlaceAndResult({
             </span>
           </div>
         </div>
-        <H2HCompare payload={computed.payload} youId={youAreHost ? "host" : "guest"} readOnly />
+        <H2HCompare payload={computed.payload} youId={youAreHost ? "host" : "guest"} readOnly sport={sport} />
         <button
           onClick={onLeave}
           className="btn-ball w-full rounded-2xl py-4 font-display text-xl font-bold uppercase tracking-widest"
@@ -433,11 +427,13 @@ function PlaceAndResult({
   }
 
   // ----- placing -----
+  const Board = sport.Board;
+  const surface = sport.id === "football" ? "field" : "court";
   return (
     <div className="mx-auto max-w-3xl space-y-4">
-      <Header />
+      <Header sport={sport} />
       <div className="rounded-2xl border border-line bg-panel p-3 text-sm text-slate-300">
-        Draft's done — arrange your five, then lock in. Both squads sim the moment
+        Draft's done — arrange your squad, then lock in. Both teams sim the moment
         you're both ready.
       </div>
       <div className="grid gap-4 lg:grid-cols-[1fr_330px]">
@@ -450,7 +446,7 @@ function PlaceAndResult({
               <div key={p.name} className="flex items-center gap-2 text-sm">
                 <span className="font-bold text-slate-200">{p.name}</span>
                 <span className="text-slate-500">
-                  · {p.rating} OVR · {p.positions.join("/")}
+                  · {p.rating} OVR · {sport.playerPositionLabel(p)}
                 </span>
               </div>
             ))}
@@ -458,10 +454,10 @@ function PlaceAndResult({
           <div className="mt-3 text-xs text-slate-500">
             {mySubmitted
               ? "Locked in — waiting for your opponent…"
-              : "Tap two spots on the court to swap players into their best positions."}
+              : `Tap two spots on the ${surface} to swap players into their best positions.`}
           </div>
         </div>
-        <CourtBoard
+        <Board
           roster={roster}
           onSwap={
             mySubmitted
@@ -473,7 +469,7 @@ function PlaceAndResult({
       </div>
       {!mySubmitted && (
         <button
-          disabled={busy || POSITIONS.some((pos) => !roster[pos])}
+          disabled={busy || sport.slots.some((pos) => !roster[pos])}
           onClick={() => {
             submittedRef.current = true;
             onSubmitRoster(roster);
@@ -491,22 +487,26 @@ function PlaceAndResult({
 }
 
 // ---------------------------------------------------------------------------
-function Shell({ children }) {
+function Shell({ children, sport }) {
   return (
     <div className="mx-auto max-w-md">
-      <Header />
+      <Header sport={sport} />
       {children}
     </div>
   );
 }
-function Header() {
+function Header({ sport }) {
+  const isFootball = sport?.id === "football";
+  const size = isFootball ? "seven" : "five";
+  const poolSize = isFootball ? "eighteen" : "fifteen";
+  const verb = isFootball ? "play it out" : "sim it out";
   return (
     <div className="mb-3">
       <h1 className="font-display text-2xl font-bold uppercase tracking-wide sm:text-3xl">
-        🎯 Draft
+        {isFootball ? "🏈" : "🎯"} Draft
       </h1>
       <p className="text-xs text-slate-400">
-        Snake-draft five from a shared pool of fifteen, then sim it out. Win and
+        Snake-draft {size} from a shared pool of {poolSize}, then {verb}. Win and
         climb — online only.
       </p>
     </div>

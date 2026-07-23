@@ -267,9 +267,25 @@ function FootballHome({ navigate, marquee }) {
         </button>
 
         <button
-          onClick={() => navigate("/battle/alltime")}
+          onClick={() => navigate("/draft")}
           className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
           style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">🎯</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
+            Draft <span className="text-emerald-400">· Online</span>
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Create a room, share the code. Eighteen stars spawn in and you snake-
+            draft seven apiece, then your offenses collide. Winner climbs the
+            ranked ladder.
+          </p>
+        </button>
+
+        <button
+          onClick={() => navigate("/battle/alltime")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
+          style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
         >
           <div className="text-3xl">🐐</div>
           <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
@@ -283,9 +299,25 @@ function FootballHome({ navigate, marquee }) {
         </button>
 
         <button
+          onClick={() => navigate("/battle/historic")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
+          style={{ animationDelay: "160ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">🕰️</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
+            Historic Battle
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            One spin draws a real team and locks their era. Beat the actual
+            squad with players from their own decade — everyone at his natural
+            position.
+          </p>
+        </button>
+
+        <button
           onClick={() => navigate("/packs")}
-          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] sm:col-span-2"
-          style={{ animationDelay: "140ms", animationFillMode: "backwards" }}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
+          style={{ animationDelay: "200ms", animationFillMode: "backwards" }}
         >
           <div className="text-3xl">🎁</div>
           <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
@@ -293,22 +325,10 @@ function FootballHome({ navigate, marquee }) {
           </div>
           <p className="mt-1 text-sm text-slate-400">
             Seven packs, one per roster slot — each deals five 80+ players.
-            Upgrade one slot to a pack of 88+ (with a 90+ inside), take one from
-            each, and chase the highest team overall.
+            Upgrade one slot to 88+/90+, take one from each. Solo for the
+            leaderboard, or open packs against a friend for Elo.
           </p>
         </button>
-
-        <div className="animate-slide-up rounded-2xl border border-dashed border-line bg-panel/50 p-6 text-left sm:col-span-2" style={{ animationDelay: "200ms", animationFillMode: "backwards" }}>
-          <div className="text-3xl">🚧</div>
-          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-slate-300">
-            Online Modes Coming
-          </div>
-          <p className="mt-1 text-sm text-slate-400">
-            Online head-to-head, snake draft and pack versus are next up for
-            football. For now, everything here is single-player — or flip back to
-            Basketball up top for the online slate.
-          </p>
-        </div>
       </div>
 
       <div className="mt-8 rounded-2xl border border-line bg-panel/60 p-4 text-xs text-slate-500">

@@ -1,21 +1,35 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../lib/auth.jsx";
+import { useSport } from "../lib/sport.jsx";
+import { getSport, sportForPlayer, SPORTS } from "../lib/sports.js";
 import { usePackRoom } from "../lib/packRoom.js";
-import { evaluateTeam, simulateSeason, simulateSeries, statEdges, makeRng } from "../../../shared/sim.js";
 import PackBuilder from "../components/PackBuilder.jsx";
 import H2HCompare from "../components/H2HCompare.jsx";
 import RankBadge from "../components/RankBadge.jsx";
 import AuthPanel from "../components/AuthPanel.jsx";
-import CourtBoard from "../components/CourtBoard.jsx";
 import { copyText } from "../lib/share.js";
 
-export default function PackVersus({ code: inviteCode, navigate }) {
+export default function PackVersus({ code: inviteCode, sportParam, navigate }) {
   const { user, profile, loading, configured, refreshProfile } = useAuth();
+  const activeSport = useSport();
   const pack = usePackRoom();
   const { room, error, busy } = pack;
   const [name, setName] = useState("");
   const [joinCode, setJoinCode] = useState(inviteCode || "");
   const [copied, setCopied] = useState(false);
+
+  // The room's sport: read off a submitted roster once one exists (authoritative
+  // for both players), else the sport in the invite link, else the host's active
+  // sport. Packs are built independently, so the sport must travel in the link.
+  const sport = useMemo(() => {
+    const r = room?.host_roster || room?.guest_roster;
+    if (r) {
+      const first = Object.values(r).find(Boolean);
+      if (first) return sportForPlayer(first);
+    }
+    if (sportParam && SPORTS[sportParam]) return getSport(sportParam);
+    return activeSport;
+  }, [room, sportParam, activeSport]);
 
   useEffect(() => {
     if (profile?.username) setName(profile.username);
@@ -86,7 +100,7 @@ export default function PackVersus({ code: inviteCode, navigate }) {
 
   // ----- lobby: host waiting for a guest -----
   if (room.status === "lobby") {
-    const link = `${location.origin}/#/packs/versus/${room.code}`;
+    const link = `${location.origin}/#/packs/versus/${room.code}/${sport.id}`;
     return (
       <Shell>
         <div className="rounded-2xl border border-line bg-panel p-5 text-center">
@@ -118,6 +132,7 @@ export default function PackVersus({ code: inviteCode, navigate }) {
     return (
       <PackResult
         room={room}
+        sport={sport}
         yourIndex={yourIndex}
         youAreHost={youAreHost}
         onFinish={(w, r) => pack.finishPack(room.code, w, r)}
@@ -129,6 +144,8 @@ export default function PackVersus({ code: inviteCode, navigate }) {
   }
 
   // ----- building -----
+  const Board = sport.Board;
+  const packCount = sport.slots.length;
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-2 flex items-center justify-between">
@@ -139,18 +156,19 @@ export default function PackVersus({ code: inviteCode, navigate }) {
         <>
           <Loading label={`Locked in — waiting for ${oppName || "your opponent"} to open their packs…`} />
           <div className="mt-4">
-            <CourtBoard roster={yourRoster} title="Your Pack Squad" />
+            <Board roster={yourRoster} title="Your Pack Squad" />
           </div>
         </>
       ) : (
         <PackBuilder
-          confirmLabel="🔒 Lock in my five"
+          sport={sport}
+          confirmLabel="🔒 Lock in my squad"
           busy={busy}
           onComplete={(upgraded, roster) => pack.submitTeam(room.code, upgraded, roster)}
           intro={
             <p className="mb-4 text-xs text-slate-400">
-              Open your packs blind and build your five. Pick{" "}
-              <span className="text-hoop2">one position to upgrade</span> to a pack of 88+ (with a 90+ inside), then take
+              Open your {packCount} packs blind and build your squad. Pick{" "}
+              <span className="text-hoop2">one slot to upgrade</span> to a pack of 88+ (with a 90+ inside), then take
               one from each. Both lock in → you face off for Elo.
             </p>
           }
@@ -162,18 +180,18 @@ export default function PackVersus({ code: inviteCode, navigate }) {
   );
 }
 
-function PackResult({ room, yourIndex, youAreHost, onFinish, onProfileRefresh, profile, onLeave }) {
+function PackResult({ room, sport, yourIndex, youAreHost, onFinish, onProfileRefresh, profile, onLeave }) {
   const finishedRef = useRef(false);
 
   const computed = useMemo(() => {
     const A = room.host_roster;
     const B = room.guest_roster;
     if (!A || !B) return null;
-    const rng = makeRng(Number(room.seed) >>> 0);
-    const evA = evaluateTeam(A);
-    const evB = evaluateTeam(B);
-    const series = simulateSeries(evA, evB, rng);
-    const seasons = { host: simulateSeason(A, rng), guest: simulateSeason(B, rng) };
+    const rng = sport.makeRng(Number(room.seed) >>> 0);
+    const evA = sport.evaluateTeam(A);
+    const evB = sport.evaluateTeam(B);
+    const series = sport.simulateSeries(evA, evB, rng);
+    const seasons = { host: sport.simulateSeason(A, rng), guest: sport.simulateSeason(B, rng) };
     return {
       winnerIndex: series.winner === "A" ? 0 : 1,
       payload: {
@@ -182,11 +200,11 @@ function PackResult({ room, yourIndex, youAreHost, onFinish, onProfileRefresh, p
         seasons,
         rosters: { host: A, guest: B },
         series,
-        edges: statEdges(evA, evB),
+        edges: sport.statEdges(evA, evB),
         winnerId: series.winner === "A" ? "host" : "guest",
       },
     };
-  }, [room]);
+  }, [room, sport]);
 
   // Host finalizes once (records result + Elo).
   useEffect(() => {
@@ -225,7 +243,7 @@ function PackResult({ room, yourIndex, youAreHost, onFinish, onProfileRefresh, p
       ) : (
         <Loading label="Simulating the matchup…" />
       )}
-      <H2HCompare payload={computed.payload} youId={youAreHost ? "host" : "guest"} readOnly />
+      <H2HCompare payload={computed.payload} youId={youAreHost ? "host" : "guest"} readOnly sport={sport} />
       <button onClick={onLeave} className="btn-ball w-full rounded-2xl py-4 font-display text-xl font-bold uppercase tracking-widest">
         🎁 New pack room
       </button>

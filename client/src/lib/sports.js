@@ -8,6 +8,7 @@ import * as bballSim from "../../../shared/sim.js";
 import * as bballSpin from "../../../shared/players.js";
 import { randomLegend as bballRandomLegend } from "../../../shared/legends.js";
 import { dealPacks as bballDealPacks } from "../../../shared/packs.js";
+import * as bballDraft from "../../../shared/draft.js";
 import { encodeSolo } from "./shareCode.js";
 import CourtBoard from "../components/CourtBoard.jsx";
 import FullCourt from "../components/FullCourt.jsx";
@@ -18,6 +19,7 @@ import * as fbSpin from "../../../shared/football/spin.js";
 import * as fbPlayers from "../../../shared/football/players.js";
 import { randomLegend as fbRandomLegend } from "../../../shared/football/legends.js";
 import { dealPacks as fbDealPacks } from "../../../shared/football/packs.js";
+import * as fbDraft from "../../../shared/football/draft.js";
 import FieldBoard from "../components/FieldBoard.jsx";
 import FieldVersus from "../components/FieldVersus.jsx";
 
@@ -81,6 +83,15 @@ const basketball = {
   },
   packBestKey: "arena-pack-best",
   supportsPackOnline: true,
+  // online draft
+  draftPool: bballDraft.draftPool,
+  rosterFromPicks: bballDraft.rosterFromPicks,
+  whoseTurn: bballDraft.whoseTurn,
+  snakeOrder: bballDraft.SNAKE_ORDER,
+  totalPicks: bballDraft.TOTAL_PICKS,
+  picksPerPlayer: bballDraft.PICKS_PER_PLAYER,
+  draftPoolSize: bballDraft.DRAFT_POOL_SIZE,
+  supportsDraftOnline: true,
   // season framing
   seasonGames: 82,
   seasonLabel: "82-game season",
@@ -140,7 +151,15 @@ const football = {
     FLEX: "Flex · RB/WR/TE",
   },
   packBestKey: "arena-pack-best-football",
-  supportsPackOnline: false,
+  supportsPackOnline: true,
+  draftPool: fbDraft.draftPool,
+  rosterFromPicks: fbDraft.rosterFromPicks,
+  whoseTurn: fbDraft.whoseTurn,
+  snakeOrder: fbDraft.SNAKE_ORDER,
+  totalPicks: fbDraft.TOTAL_PICKS,
+  picksPerPlayer: fbDraft.PICKS_PER_PLAYER,
+  draftPoolSize: fbDraft.DRAFT_POOL_SIZE,
+  supportsDraftOnline: true,
   seasonGames: 17,
   seasonLabel: "17-game season",
   simCta: "Sim the 17-game season",

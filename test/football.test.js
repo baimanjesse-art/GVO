@@ -14,6 +14,15 @@ import {
 import { spinWheel, respinSpin, canRespin, bestPick, eraLineupSpin, decadeSpin, bestLineup } from "../shared/football/spin.js";
 import { LEGENDS, randomLegend } from "../shared/football/legends.js";
 import { dealPacks, PACK_SIZE, PREMIUM_FLOOR, ELITE_FLOOR } from "../shared/football/packs.js";
+import {
+  draftPool,
+  rosterFromPicks,
+  whoseTurn,
+  SNAKE_ORDER,
+  TOTAL_PICKS,
+  PICKS_PER_PLAYER,
+  DRAFT_POOL_SIZE,
+} from "../shared/football/draft.js";
 
 test("roster is 7 slots incl a FLEX that takes RB/WR/TE", () => {
   assert.equal(SLOTS.length, 7);
@@ -214,6 +223,33 @@ test("pack & play deals one pack per slot, premium is 88+/90+, no dupes", () => 
   const premium = packs.WR1;
   assert.ok(premium.every((p) => p.rating >= PREMIUM_FLOOR), "premium WR pack should be all 88+");
   assert.ok(premium.some((p) => p.rating >= ELITE_FLOOR), "premium WR pack should include a 90+");
+});
+
+test("online draft: 18-man pool with position spread, 7 each, snake order", () => {
+  assert.equal(PICKS_PER_PLAYER, 7);
+  assert.equal(TOTAL_PICKS, 14);
+  assert.equal(SNAKE_ORDER.length, 14);
+  assert.equal(SNAKE_ORDER.filter((x) => x === 0).length, 7, "host gets 7 picks");
+  assert.equal(SNAKE_ORDER.filter((x) => x === 1).length, 7, "guest gets 7 picks");
+  assert.deepEqual(SNAKE_ORDER.slice(0, 4), [0, 1, 1, 0], "second picker isn't punished");
+  assert.equal(whoseTurn(0), 0);
+  assert.equal(whoseTurn(14), null);
+
+  const pool = draftPool({ rng: makeRng(2) });
+  assert.equal(pool.length, DRAFT_POOL_SIZE);
+  const byPos = { QB: 0, RB: 0, WR: 0, TE: 0 };
+  const names = new Set();
+  for (const p of pool) {
+    byPos[p.position]++;
+    assert.ok(!names.has(p.name), "no duplicate players in the pool");
+    names.add(p.name);
+  }
+  assert.ok(byPos.QB >= 2, `pool should have QBs for both players, got ${byPos.QB}`);
+  assert.ok(byPos.TE >= 2, `pool should have TEs, got ${byPos.TE}`);
+
+  // any seven picks fill a full field roster (the lone-QB case still fills QB)
+  const roster = rosterFromPicks(pool.slice(0, 7));
+  for (const slot of SLOTS) assert.ok(roster[slot], `${slot} unfilled from 7 picks`);
 });
 
 test("head-to-head produces one football-scored game and a winner", () => {
