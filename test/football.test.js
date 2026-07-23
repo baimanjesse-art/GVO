@@ -11,6 +11,7 @@ import {
   makeRng,
   SEASON_GAMES,
 } from "../shared/football/sim.js";
+import { spinWheel, respinSpin, canRespin, bestPick } from "../shared/football/spin.js";
 
 test("roster is 7 slots incl a FLEX that takes RB/WR/TE", () => {
   assert.equal(SLOTS.length, 7);
@@ -104,6 +105,34 @@ test("season sim returns 0..17 wins and a grade; a perfect year is possible but 
   }
   assert.ok(perfect > 0, "an elite team should go 17-0 at least sometimes");
   assert.ok(perfect / N < 0.5, "but not most of the time");
+});
+
+test("the wheel lands on a team-era with enough undrafted players", () => {
+  const s = spinWheel({ rng: makeRng(3) });
+  assert.ok(s, "a fresh wheel should always land somewhere");
+  assert.equal(s.key, `${s.decade}|${s.team}`);
+  assert.ok(s.players.length >= 4, "a landed pool has draftable depth");
+
+  // Exhausting a decade's pools still eventually returns null, never a used key.
+  const used = POOL_KEYS.slice();
+  assert.equal(spinWheel({ usedPoolKeys: used }), null);
+});
+
+test("respins reroll one reel and best-fit fills an open slot sensibly", () => {
+  // pick a decade/team known to have era-mates so respins have somewhere to go
+  const s = spinWheel({ rng: makeRng(1) });
+  const eraCanRespin = canRespin({ axis: "decade", decade: s.decade, team: s.team, usedPoolKeys: [], takenNames: [] });
+  if (eraCanRespin) {
+    const r = respinSpin({ axis: "decade", decade: s.decade, team: s.team, usedPoolKeys: [], takenNames: [], rng: makeRng(9) });
+    assert.equal(r.team, s.team, "era respin keeps the franchise");
+    assert.notEqual(r.decade, s.decade, "era respin changes the decade");
+  }
+
+  const chiefs = POOLS["2020s|Kansas City Chiefs"];
+  const roster = { QB: null, RB: null, WR1: null, WR2: null, WR3: null, TE: null, FLEX: null };
+  const pick = bestPick(chiefs, roster);
+  assert.ok(pick && pick.player && pick.slot, "best-fit returns a player + slot");
+  assert.equal(fitDistance(pick.player, pick.slot), 0, "best fit is a natural fit when one is available");
 });
 
 test("head-to-head produces one football-scored game and a winner", () => {

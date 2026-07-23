@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { headshotUrl, initials } from "../../../shared/photos.js";
-import { teamMeta } from "../../../shared/constants.js";
+import { teamMetaAny as teamMeta } from "../lib/teamColors.js";
 
 /**
  * Official NBA headshot with a styled initials fallback (team colors) for the

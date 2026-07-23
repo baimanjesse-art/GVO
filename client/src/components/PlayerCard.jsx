@@ -1,4 +1,4 @@
-import { teamMeta } from "../../../shared/constants.js";
+import { sportForPlayer } from "../lib/sports.js";
 import PlayerPhoto from "./PlayerPhoto.jsx";
 
 function ovrColor(r) {
@@ -10,7 +10,10 @@ function ovrColor(r) {
 }
 
 export default function PlayerCard({ player, selected, disabled, onClick, compact }) {
-  const meta = teamMeta(player.team);
+  const sport = sportForPlayer(player);
+  const meta = sport.teamMeta(player.team);
+  const posLabel = sport.playerPositionLabel(player);
+  const stats = sport.playerStats(player);
   return (
     <button
       onClick={onClick}
@@ -42,7 +45,7 @@ export default function PlayerCard({ player, selected, disabled, onClick, compac
               className="rounded px-1 py-px font-bold text-white/95"
               style={{ background: meta.color }}
             >
-              {player.positions.join("/")}
+              {posLabel}
             </span>
             <span className="font-semibold text-slate-400">
               {meta.abbr} · {player.decade}
@@ -61,11 +64,7 @@ export default function PlayerCard({ player, selected, disabled, onClick, compac
 
       {!compact && (
         <div className="relative grid grid-cols-3 gap-px border-t border-line/60 bg-line/40 text-center text-xs">
-          {[
-            [player.pts, "PPG"],
-            [player.reb, "RPG"],
-            [player.ast, "APG"],
-          ].map(([v, label]) => (
+          {stats.map(([v, label]) => (
             <div key={label} className="bg-panel/90 py-1.5">
               <span className="font-bold tabular-nums">{v}</span>
               <span className="ml-1 text-[10px] text-slate-500">{label}</span>

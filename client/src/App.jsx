@@ -10,15 +10,19 @@ import Leaderboard from "./screens/Leaderboard.jsx";
 import SharedResult from "./screens/SharedResult.jsx";
 import Account from "./screens/Account.jsx";
 import { useAuth } from "./lib/auth.jsx";
+import { useSportControls } from "./lib/sport.jsx";
 import RankBadge from "./components/RankBadge.jsx";
 
 export default function App() {
   const [segments, navigate] = useHashRoute();
   const [page, param] = segments;
+  const sportCtl = useSportControls();
+  const sportId = sportCtl?.sportId || "basketball";
+  const isFootball = sportId === "football";
 
   let screen;
-  if (!page) screen = <Home navigate={navigate} />;
-  else if (page === "solo") screen = <SoloGame />;
+  if (!page) screen = <Home navigate={navigate} sportId={sportId} />;
+  else if (page === "solo") screen = <SoloGame key={sportId} />;
   else if (page === "h2h") screen = <H2HGame inviteCode={param} />;
   else if (page === "draft") screen = <DraftGame code={param} navigate={navigate} />;
   else if (page === "packs")
@@ -50,24 +54,39 @@ export default function App() {
             </span>
           </button>
           <nav className="flex items-center gap-1 text-sm font-bold">
+            {sportCtl && (
+              <SportToggle
+                sportId={sportId}
+                onPick={(id) => {
+                  sportCtl.setSport(id);
+                  // Only Solo is wired for football today — send the user there
+                  // when they flip sports off a basketball-only screen.
+                  if (id === "football" && !["", "solo"].includes(page)) navigate("/solo");
+                }}
+              />
+            )}
             <NavBtn onClick={() => navigate("/solo")} active={page === "solo"}>
               Solo
             </NavBtn>
-            <NavBtn onClick={() => navigate("/draft")} active={page === "draft"}>
-              <span className="sm:hidden">🎯</span>
-              <span className="hidden sm:inline">Draft</span>
-            </NavBtn>
-            <NavBtn onClick={() => navigate("/battle")} active={page === "battle"}>
-              <span className="sm:hidden">⚔️</span>
-              <span className="hidden sm:inline">Battles</span>
-            </NavBtn>
-            <NavBtn
-              onClick={() => navigate("/leaderboard")}
-              active={page === "leaderboard"}
-            >
-              <span className="sm:hidden">🏆</span>
-              <span className="hidden sm:inline">Ranks</span>
-            </NavBtn>
+            {!isFootball && (
+              <>
+                <NavBtn onClick={() => navigate("/draft")} active={page === "draft"}>
+                  <span className="sm:hidden">🎯</span>
+                  <span className="hidden sm:inline">Draft</span>
+                </NavBtn>
+                <NavBtn onClick={() => navigate("/battle")} active={page === "battle"}>
+                  <span className="sm:hidden">⚔️</span>
+                  <span className="hidden sm:inline">Battles</span>
+                </NavBtn>
+                <NavBtn
+                  onClick={() => navigate("/leaderboard")}
+                  active={page === "leaderboard"}
+                >
+                  <span className="sm:hidden">🏆</span>
+                  <span className="hidden sm:inline">Ranks</span>
+                </NavBtn>
+              </>
+            )}
             <AccountChip navigate={navigate} active={page === "account"} />
           </nav>
         </div>
@@ -105,6 +124,38 @@ function AccountChip({ navigate, active }) {
       </span>
       <RankBadge elo={profile?.elo ?? 1000} size="sm" />
     </button>
+  );
+}
+
+function SportToggle({ sportId, onPick }) {
+  const opts = [
+    { id: "basketball", icon: "🏀", label: "Basketball" },
+    { id: "football", icon: "🏈", label: "Football" },
+  ];
+  return (
+    <div className="mr-1 flex items-center rounded-full border border-line bg-panel2 p-0.5">
+      {opts.map((o) => {
+        const active = sportId === o.id;
+        return (
+          <button
+            key={o.id}
+            onClick={() => onPick(o.id)}
+            title={o.label}
+            aria-pressed={active}
+            className={`rounded-full px-2 py-1 text-base leading-none transition ${
+              active
+                ? "bg-hoop/20 ring-1 ring-hoop/60"
+                : "opacity-55 grayscale hover:opacity-90 hover:grayscale-0"
+            }`}
+          >
+            <span>{o.icon}</span>
+            <span className="ml-1 hidden align-middle font-display text-[11px] uppercase tracking-wider sm:inline">
+              {o.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
 

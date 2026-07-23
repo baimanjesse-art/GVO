@@ -1,21 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { spinWheel, respinSpin, canRespin } from "../../../shared/players.js";
-import { simulateSeason, bestPick, makeRng } from "../../../shared/sim.js";
-import { POSITIONS, ROUNDS, teamMeta } from "../../../shared/constants.js";
-import { encodeSolo } from "../lib/shareCode.js";
+import { useSport } from "../lib/sport.jsx";
 import SpinReel from "../components/SpinReel.jsx";
 import PlayerCard from "../components/PlayerCard.jsx";
-import CourtBoard from "../components/CourtBoard.jsx";
 import SeasonResults from "../components/SeasonResults.jsx";
 import SeasonPlayback from "../components/SeasonPlayback.jsx";
 import Confetti from "../components/Confetti.jsx";
 import PlayerPhoto from "../components/PlayerPhoto.jsx";
 
-const EMPTY_ROSTER = { PG: null, SG: null, SF: null, PF: null, C: null };
-
 export default function SoloGame() {
+  const sport = useSport();
+  const { slots: SLOTS, rounds: ROUNDS, teamMeta, Board } = sport;
+
   const [phase, setPhase] = useState("idle"); // idle | spinning | picking | simming | results
-  const [roster, setRoster] = useState(EMPTY_ROSTER);
+  const [roster, setRoster] = useState(() => sport.emptyRoster());
   const [usedPoolKeys, setUsedPoolKeys] = useState([]);
   const [spin, setSpin] = useState(null);
   const [spinId, setSpinId] = useState(0);
@@ -25,7 +22,7 @@ export default function SoloGame() {
   const [shareCode, setShareCode] = useState(null);
   const [respins, setRespins] = useState({ era: 1, team: 1 });
 
-  const picksMade = POSITIONS.filter((p) => roster[p]).length;
+  const picksMade = SLOTS.filter((s) => roster[s]).length;
   const rosterFull = picksMade === ROUNDS;
 
   // After a player is locked into a slot, scroll back up to the spin button
@@ -41,12 +38,12 @@ export default function SoloGame() {
   }, [picksMade]);
 
   const takenNames = useMemo(
-    () => POSITIONS.map((p) => roster[p]?.name).filter(Boolean),
-    [roster]
+    () => SLOTS.map((s) => roster[s]?.name).filter(Boolean),
+    [roster, SLOTS]
   );
 
   function doSpin() {
-    const s = spinWheel({ usedPoolKeys, takenNames });
+    const s = sport.spinWheel({ usedPoolKeys, takenNames });
     if (!s) return;
     setSpin(s);
     setSelected(null);
@@ -75,7 +72,7 @@ export default function SoloGame() {
   }
 
   function autoPick() {
-    const pick = bestPick(spin.players, roster);
+    const pick = sport.bestPick(spin.players, roster);
     if (pick) setSelected(pick.player);
   }
 
@@ -97,13 +94,13 @@ export default function SoloGame() {
     ? { decade: spin.decade, team: spin.team, usedPoolKeys, takenNames }
     : null;
   const eraRespinPossible =
-    phase === "picking" && respins.era > 0 && respinBase && canRespin({ axis: "decade", ...respinBase });
+    phase === "picking" && respins.era > 0 && respinBase && sport.canRespin({ axis: "decade", ...respinBase });
   const teamRespinPossible =
-    phase === "picking" && respins.team > 0 && respinBase && canRespin({ axis: "team", ...respinBase });
+    phase === "picking" && respins.team > 0 && respinBase && sport.canRespin({ axis: "team", ...respinBase });
 
   function doRespin(axis) {
     if (!spin) return;
-    const s = respinSpin({ axis, ...respinBase });
+    const s = sport.respinSpin({ axis, ...respinBase });
     if (!s) return;
     setRespins((r) => (axis === "decade" ? { ...r, era: r.era - 1 } : { ...r, team: r.team - 1 }));
     setSpin(s);
@@ -114,15 +111,15 @@ export default function SoloGame() {
 
   function runSeason() {
     const seed = (Math.random() * 2 ** 31) >>> 0;
-    const res = simulateSeason(roster, makeRng(seed));
+    const res = sport.simulateSeason(roster, sport.makeRng(seed));
     setResult(res);
-    setShareCode(encodeSolo(history, seed));
+    if (sport.supportsShare && sport.encodeSolo) setShareCode(sport.encodeSolo(history, seed));
     setPhase("simming");
   }
 
   function reset() {
     setPhase("idle");
-    setRoster(EMPTY_ROSTER);
+    setRoster(sport.emptyRoster());
     setUsedPoolKeys([]);
     setSpin(null);
     setSelected(null);
@@ -135,7 +132,7 @@ export default function SoloGame() {
   if (phase === "simming" && result) {
     return (
       <div className="pt-8 sm:pt-16">
-        <SeasonPlayback result={result} onDone={() => setPhase("results")} />
+        <SeasonPlayback result={result} sport={sport} onDone={() => setPhase("results")} />
       </div>
     );
   }
@@ -143,11 +140,12 @@ export default function SoloGame() {
   if (phase === "results" && result) {
     return (
       <div className="mx-auto max-w-3xl animate-slide-up">
-        {result.wins >= 60 && <Confetti />}
+        {result.wins >= sport.confettiWins && <Confetti />}
         <SeasonResults
           roster={roster}
           result={result}
           shareCode={shareCode}
+          sport={sport}
           onPlayAgain={reset}
         />
       </div>
@@ -181,7 +179,16 @@ export default function SoloGame() {
 
       <div className="grid gap-4 lg:grid-cols-[1fr_330px]">
         <div className="space-y-4">
-          {!rosterFull && <SpinReel result={spin} spinId={spinId} onDone={() => setPhase("picking")} />}
+          {!rosterFull && (
+            <SpinReel
+              result={spin}
+              spinId={spinId}
+              onDone={() => setPhase("picking")}
+              decades={sport.decades}
+              teams={sport.teams}
+              teamMeta={teamMeta}
+            />
+          )}
 
           {phase === "idle" && !rosterFull && (
             <button
@@ -197,13 +204,13 @@ export default function SoloGame() {
               onClick={runSeason}
               className="w-full animate-flash rounded-2xl bg-gradient-to-b from-emerald-400 to-emerald-600 py-5 font-display text-2xl font-bold uppercase tracking-widest text-black transition hover:from-emerald-300 hover:to-emerald-500 active:scale-[0.98]"
             >
-              🏆 Sim the 82-game season
+              🏆 {sport.simCta}
             </button>
           )}
 
           {phase === "spinning" && (
             <div className="rounded-2xl border border-line bg-panel p-6 text-center text-slate-400">
-              <span className="animate-floaty inline-block text-3xl">🏀</span>
+              <span className="animate-floaty inline-block text-3xl">{sport.icon}</span>
               <div className="mt-1 text-sm">The wheel decides your fate…</div>
             </div>
           )}
@@ -276,7 +283,7 @@ export default function SoloGame() {
                     />
                     <span className="min-w-0 flex-1 truncate">
                       <span className="font-bold text-slate-200">{h.player.name}</span>{" "}
-                      → {h.slot}
+                      → {sport.slotLabel(h.slot)}
                     </span>
                     <span className="flex-none text-slate-500">
                       R{h.round} · {h.decade} {teamMeta(h.team).abbr}
@@ -288,7 +295,7 @@ export default function SoloGame() {
           )}
         </div>
 
-        <CourtBoard
+        <Board
           roster={roster}
           placing={phase === "picking" ? selected : null}
           onPlace={handlePlace}

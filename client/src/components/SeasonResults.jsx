@@ -7,9 +7,11 @@ import { downloadShareCard, copyText } from "../lib/share.js";
 /**
  * Single-team season result view (used by solo mode and shared-result pages).
  * `shareCode` (optional) is a self-contained URL code — sharing needs no server.
+ * `sport` (optional) picks the roster board; defaults to basketball's court.
  */
-export default function SeasonResults({ name, roster, result, shareCode, onPlayAgain }) {
+export default function SeasonResults({ name, roster, result, shareCode, onPlayAgain, sport }) {
   const [shareState, setShareState] = useState("");
+  const Board = sport?.Board || CourtBoard;
 
   async function handleShareLink() {
     if (!shareCode) return;
@@ -89,7 +91,7 @@ export default function SeasonResults({ name, roster, result, shareCode, onPlayA
         </div>
       </div>
 
-      <CourtBoard roster={roster} title="Final Roster" />
+      <Board roster={roster} title="Final Roster" />
 
       <div className="flex flex-wrap gap-2">
         {onPlayAgain && (

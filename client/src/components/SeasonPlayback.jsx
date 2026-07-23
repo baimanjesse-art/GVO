@@ -6,13 +6,14 @@ const MONTHS = ["OCT", "NOV", "DEC", "JAN", "FEB", "MAR", "APR"];
  * Plays the 82-game season back game by game: running record, live win/loss
  * strip, streak callouts. `result.games` is the per-game W/L array.
  */
-export default function SeasonPlayback({ result, teamName = "YOUR SQUAD", onDone }) {
+export default function SeasonPlayback({ result, teamName = "YOUR SQUAD", onDone, sport }) {
   const [idx, setIdx] = useState(0);
   const [flash, setFlash] = useState(null);
   const doneRef = useRef(false);
 
   const games = result.games || [];
-  const total = games.length || 82;
+  const total = games.length || sport?.seasonGames || 82;
+  const seasonLabel = sport?.seasonLabel || "82-game season";
 
   useEffect(() => {
     if (idx >= total) {
@@ -70,7 +71,7 @@ export default function SeasonPlayback({ result, teamName = "YOUR SQUAD", onDone
 
         <div className="px-5 py-7 text-center">
           <div className="text-[10px] uppercase tracking-[0.35em] text-slate-500">
-            82-game season
+            {seasonLabel}
           </div>
           <div className="mt-1 font-display text-7xl font-bold tabular-nums leading-none sm:text-8xl">
             <span className="text-emerald-400">{wins}</span>

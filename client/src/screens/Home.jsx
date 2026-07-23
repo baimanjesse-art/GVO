@@ -1,4 +1,5 @@
 import PlayerPhoto from "../components/PlayerPhoto.jsx";
+import { useSport } from "../lib/sport.jsx";
 
 const MARQUEE = [
   { name: "Michael Jordan", team: "Chicago Bulls" },
@@ -8,7 +9,21 @@ const MARQUEE = [
   { name: "Nikola Jokic", team: "Denver Nuggets" },
 ];
 
+const MARQUEE_FB = [
+  { name: "Jerry Rice", team: "San Francisco 49ers" },
+  { name: "Tom Brady", team: "New England Patriots" },
+  { name: "Patrick Mahomes", team: "Kansas City Chiefs" },
+  { name: "Jim Brown", team: "Cleveland Browns" },
+  { name: "Justin Jefferson", team: "Minnesota Vikings" },
+];
+
 export default function Home({ navigate }) {
+  const sport = useSport();
+  const isFootball = sport.id === "football";
+  const marquee = isFootball ? MARQUEE_FB : MARQUEE;
+
+  if (isFootball) return <FootballHome navigate={navigate} marquee={marquee} />;
+
   return (
     <div className="mx-auto max-w-3xl">
       <div className="relative overflow-hidden py-10 text-center sm:py-14">
@@ -176,6 +191,100 @@ export default function Home({ navigate }) {
         talent, star power, positional fit and lineup balance. Mixing eras is
         the whole point — build the cross-generation super team the debates
         are made of.
+      </div>
+    </div>
+  );
+}
+
+function FootballHome({ navigate, marquee }) {
+  return (
+    <div className="mx-auto max-w-3xl">
+      <div className="relative overflow-hidden py-10 text-center sm:py-14">
+        {/* field markings behind the hero */}
+        <svg
+          viewBox="0 0 100 60"
+          className="pointer-events-none absolute inset-x-0 top-1/2 -z-10 mx-auto w-full max-w-xl -translate-y-1/2 opacity-20"
+          aria-hidden="true"
+        >
+          <g stroke="#eafff0" strokeWidth="0.35" fill="none">
+            {[20, 35, 50, 65, 80].map((x) => (
+              <line key={x} x1={x} y1="6" x2={x} y2="54" />
+            ))}
+            <rect x="6" y="6" width="8" height="48" fill="#22c55e" fillOpacity="0.3" />
+            <rect x="86" y="6" width="8" height="48" fill="#22c55e" fillOpacity="0.3" />
+          </g>
+        </svg>
+
+        <div className="mb-5 flex items-end justify-center">
+          {marquee.map((p, i) => (
+            <div
+              key={p.name}
+              className="animate-slide-up -ml-3 first:ml-0"
+              style={{
+                animationDelay: `${i * 90}ms`,
+                animationFillMode: "backwards",
+                zIndex: 10 - i,
+                transform: `translateY(${[8, 3, 0, 3, 8][i]}px)`,
+              }}
+            >
+              <PlayerPhoto
+                name={p.name}
+                team={p.team}
+                className="h-14 w-14 rounded-full border-2 border-[#14431f] shadow-[0_6px_16px_rgba(0,0,0,0.6)] sm:h-16 sm:w-16"
+              />
+            </div>
+          ))}
+        </div>
+
+        <h1
+          className="font-display text-6xl font-bold uppercase leading-none tracking-tight sm:text-8xl"
+          style={{ textShadow: "0 6px 0 rgba(0,0,0,0.45), 0 14px 34px rgba(34,197,94,0.25)" }}
+        >
+          <span className="led tabular-nums">82-0</span>{" "}
+          <span className="text-slate-100">Gridiron</span>
+        </h1>
+        <div className="mx-auto mt-2 h-1 w-28 rounded-full bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+        <p className="mx-auto mt-3 max-w-md text-sm text-slate-400 sm:text-base">
+          Spin the wheel. Get a decade and a franchise. Build a seven-man squad —
+          QB, RB, three WRs, a TE and a FLEX — one legend per spin, then sim a
+          full 17-game season. Chase the perfect year.
+        </p>
+      </div>
+
+      <div className="grid gap-3">
+        <button
+          onClick={() => navigate("/solo")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
+        >
+          <div className="text-3xl">🏈</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
+            Solo Run
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Seven spins, seven picks, one season. Assemble the offense and see
+            how close to 17-0 you can get.
+          </p>
+        </button>
+
+        <div className="animate-slide-up rounded-2xl border border-dashed border-line bg-panel/50 p-6 text-left" style={{ animationDelay: "80ms", animationFillMode: "backwards" }}>
+          <div className="text-3xl">🚧</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-slate-300">
+            More Modes Coming
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Online head-to-head, snake draft, pack &amp; play and the ranked
+            ladder are next up for football. For now, jump into a Solo Run — or
+            flip back to Basketball up top for the full slate.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8 rounded-2xl border border-line bg-panel/60 p-4 text-xs text-slate-500">
+        <span className="font-bold text-slate-400">How the sim works:</span>{" "}
+        football is a passing game, so the QB and receiving corps carry the most
+        weight — a franchise QB with real weapons wins a lot of Sundays. Your
+        record comes from talent, passing, receiving, rushing, scheme fit and
+        chemistry, with penalties for anyone stuck out of position.
       </div>
     </div>
   );

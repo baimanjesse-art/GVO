@@ -1,15 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import { DECADES, TEAM_META, teamMeta } from "../../../shared/constants.js";
-
-const ALL_TEAMS = Object.keys(TEAM_META);
+import {
+  DECADES as BBALL_DECADES,
+  TEAM_META as BBALL_TEAM_META,
+  teamMeta as bballTeamMeta,
+} from "../../../shared/constants.js";
 
 /**
  * Two-reel slot-machine spinner. Pass `result` ({decade, team}) and a changing
  * `spinId` to start a spin; onDone fires when both reels settle. The reels
  * shake while spinning, tick down like a real wheel, and lock with a
- * team-colored glow.
+ * team-colored glow. `decades`, `teams` and `teamMeta` default to basketball
+ * so existing screens keep working; Solo passes the active sport's values.
  */
-export default function SpinReel({ result, spinId, onDone }) {
+export default function SpinReel({
+  result,
+  spinId,
+  onDone,
+  decades = BBALL_DECADES,
+  teams = Object.keys(BBALL_TEAM_META),
+  teamMeta = bballTeamMeta,
+}) {
+  const DECADES = decades;
+  const ALL_TEAMS = teams;
   const [decadeText, setDecadeText] = useState("——");
   const [teamText, setTeamText] = useState("Spin to draft");
   const [locked, setLocked] = useState({ decade: false, team: false });
