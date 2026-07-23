@@ -251,7 +251,7 @@ function FootballHome({ navigate, marquee }) {
         </p>
       </div>
 
-      <div className="grid gap-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <button
           onClick={() => navigate("/solo")}
           className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
@@ -266,15 +266,31 @@ function FootballHome({ navigate, marquee }) {
           </p>
         </button>
 
-        <div className="animate-slide-up rounded-2xl border border-dashed border-line bg-panel/50 p-6 text-left" style={{ animationDelay: "80ms", animationFillMode: "backwards" }}>
+        <button
+          onClick={() => navigate("/battle/alltime")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98]"
+          style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">🐐</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
+            All-Time Battle
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Face the '72 Dolphins, the Greatest Show on Turf, Peyton's record
+            offense. Each era deals a star per slot — build a squad to slay a
+            legend and climb your Battle Rank.
+          </p>
+        </button>
+
+        <div className="animate-slide-up rounded-2xl border border-dashed border-line bg-panel/50 p-6 text-left sm:col-span-2" style={{ animationDelay: "140ms", animationFillMode: "backwards" }}>
           <div className="text-3xl">🚧</div>
           <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide text-slate-300">
             More Modes Coming
           </div>
           <p className="mt-1 text-sm text-slate-400">
-            Online head-to-head, snake draft, pack &amp; play and the ranked
-            ladder are next up for football. For now, jump into a Solo Run — or
-            flip back to Basketball up top for the full slate.
+            Online head-to-head, snake draft and pack &amp; play are next up for
+            football. For now, run Solo or take on an All-Time squad — or flip
+            back to Basketball up top for the full slate.
           </p>
         </div>
       </div>

@@ -6,13 +6,18 @@
 import * as bballConst from "../../../shared/constants.js";
 import * as bballSim from "../../../shared/sim.js";
 import * as bballSpin from "../../../shared/players.js";
+import { randomLegend as bballRandomLegend } from "../../../shared/legends.js";
 import { encodeSolo } from "./shareCode.js";
 import CourtBoard from "../components/CourtBoard.jsx";
+import FullCourt from "../components/FullCourt.jsx";
 
 import * as fbConst from "../../../shared/football/constants.js";
 import * as fbSim from "../../../shared/football/sim.js";
 import * as fbSpin from "../../../shared/football/spin.js";
+import * as fbPlayers from "../../../shared/football/players.js";
+import { randomLegend as fbRandomLegend } from "../../../shared/football/legends.js";
 import FieldBoard from "../components/FieldBoard.jsx";
+import FieldVersus from "../components/FieldVersus.jsx";
 
 function emptyFrom(slots) {
   return Object.fromEntries(slots.map((s) => [s, null]));
@@ -49,6 +54,18 @@ const basketball = {
   makeRng: bballSim.makeRng,
   bestPick: bballSim.bestPick,
   fitDistance: bballSim.fitDistance,
+  evaluateTeam: bballSim.evaluateTeam,
+  simulateSeries: bballSim.simulateSeries,
+  statEdges: bballSim.statEdges,
+  // battle modes
+  eraLineupSpin: bballSpin.eraLineupSpin,
+  decadeSpin: bballSpin.decadeSpin,
+  pools: bballSpin.POOLS,
+  bestLineup: bballSim.bestLineup,
+  randomLegend: bballRandomLegend,
+  supportsHistoric: true,
+  supportsAllTime: true,
+  seriesLabel: "best-of-7",
   // season framing
   seasonGames: 82,
   seasonLabel: "82-game season",
@@ -56,6 +73,7 @@ const basketball = {
   confettiWins: 60,
   // UI
   Board: CourtBoard,
+  Versus: FullCourt,
   // solo share codes (basketball only for now)
   supportsShare: true,
   encodeSolo,
@@ -82,11 +100,23 @@ const football = {
   makeRng: fbSim.makeRng,
   bestPick: fbSpin.bestPick,
   fitDistance: fbSim.fitDistance,
+  evaluateTeam: fbSim.evaluateTeam,
+  simulateSeries: fbSim.simulateSeries,
+  statEdges: fbSim.statEdges,
+  eraLineupSpin: fbSpin.eraLineupSpin,
+  decadeSpin: fbSpin.decadeSpin,
+  pools: fbPlayers.POOLS,
+  bestLineup: null,
+  randomLegend: fbRandomLegend,
+  supportsHistoric: false,
+  supportsAllTime: true,
+  seriesLabel: "single game",
   seasonGames: 17,
   seasonLabel: "17-game season",
   simCta: "Sim the 17-game season",
   confettiWins: 17,
   Board: FieldBoard,
+  Versus: FieldVersus,
   supportsShare: false,
   encodeSolo: null,
   playerPositionLabel: (p) => p.position,

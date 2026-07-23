@@ -11,7 +11,8 @@ import {
   makeRng,
   SEASON_GAMES,
 } from "../shared/football/sim.js";
-import { spinWheel, respinSpin, canRespin, bestPick } from "../shared/football/spin.js";
+import { spinWheel, respinSpin, canRespin, bestPick, eraLineupSpin, decadeSpin } from "../shared/football/spin.js";
+import { LEGENDS, randomLegend } from "../shared/football/legends.js";
 
 test("roster is 7 slots incl a FLEX that takes RB/WR/TE", () => {
   assert.equal(SLOTS.length, 7);
@@ -133,6 +134,48 @@ test("respins reroll one reel and best-fit fills an open slot sensibly", () => {
   const pick = bestPick(chiefs, roster);
   assert.ok(pick && pick.player && pick.slot, "best-fit returns a player + slot");
   assert.equal(fitDistance(pick.player, pick.slot), 0, "best fit is a natural fit when one is available");
+});
+
+test("era-lineup deal fills all seven slots with eligible players", () => {
+  for (let i = 0; i < 50; i++) {
+    const s = eraLineupSpin({ usedDecades: [], takenNames: [], rng: makeRng(i + 1) });
+    assert.ok(s, "a fresh era deal should always succeed");
+    assert.equal(s.team, null);
+    for (const slot of SLOTS) {
+      const p = s.lineup[slot];
+      assert.ok(p, `${slot} was not dealt`);
+      assert.ok(SLOT_ELIGIBLE[slot].includes(p.position), `${p.name} can't fill ${slot}`);
+    }
+    // seven distinct players
+    const names = new Set(SLOTS.map((sl) => s.lineup[sl].name));
+    assert.equal(names.size, 7, "dealt players must be distinct");
+  }
+  // exhausting every decade returns null
+  assert.equal(eraLineupSpin({ usedDecades: ["1960s", "1970s", "1980s", "1990s", "2000s", "2010s", "2020s"] }), null);
+});
+
+test("every legendary squad is a valid, gradable full seven", () => {
+  assert.ok(LEGENDS.length >= 6, `expected several legends, got ${LEGENDS.length}`);
+  for (const L of LEGENDS) {
+    assert.ok(L.name && L.record && L.color, `${L.id} missing display fields`);
+    for (const slot of SLOTS) {
+      const p = L.roster[slot];
+      assert.ok(p, `${L.name} missing ${slot}`);
+      assert.ok(SLOT_ELIGIBLE[slot].includes(p.position), `${L.name}: ${p.name} can't fill ${slot}`);
+    }
+    const ev = evaluateTeam(L.roster);
+    assert.ok(ev.overall >= 75 && ev.overall <= 100, `${L.name} overall ${ev.overall} out of range`);
+  }
+  assert.ok(randomLegend(makeRng(1)), "randomLegend returns a squad");
+});
+
+test("decadeSpin stays inside its decade and can require open-slot fits", () => {
+  const s = decadeSpin({ decade: "1990s", rng: makeRng(4) });
+  assert.ok(s, "a decade with teams should spin");
+  assert.ok(s.key.startsWith("1990s|"), "landed pool is in the locked decade");
+  // require a pool that can fill a QB naturally
+  const qbSpin = decadeSpin({ decade: "1990s", openSlots: ["QB"], rng: makeRng(7) });
+  assert.ok(qbSpin.players.some((p) => p.position === "QB"), "openSlots QB filter yields a QB");
 });
 
 test("head-to-head produces one football-scored game and a winner", () => {

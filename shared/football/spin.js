@@ -1,4 +1,4 @@
-import { SLOTS } from "./constants.js";
+import { SLOTS, SLOT_ELIGIBLE, DECADES } from "./constants.js";
 import { POOLS, POOL_KEYS } from "./players.js";
 import { fitDistance } from "./sim.js";
 
@@ -67,6 +67,84 @@ export function respinSpin({ rng = Math.random, ...opts }) {
     team,
     players: POOLS[key].filter((p) => !taken.has(p.name)),
   };
+}
+
+/**
+ * Era-lineup deal (All-Time Battle): the wheel lands on a decade and deals one
+ * 88+ player for each of the seven slots (a QB at QB, backs/receivers/TE at
+ * theirs, best skill leftover at FLEX) — deduped by name, natural fits only.
+ * If an era runs thin at a slot the floor relaxes just enough to keep dealing.
+ * Every decade can come up only once per draft.
+ */
+export function eraLineupSpin({ usedDecades = [], takenNames = [], rng = Math.random, minRating = 88 } = {}) {
+  const used = new Set(usedDecades);
+  const taken = new Set(takenNames);
+  const candidates = DECADES.filter((d) => !used.has(d));
+  if (candidates.length === 0) return null;
+  const decade = candidates[Math.floor(rng() * candidates.length)];
+
+  // Unique players in the era (highest-rated stint), minus anyone drafted.
+  const byName = new Map();
+  for (const key of POOL_KEYS) {
+    if (!key.startsWith(`${decade}|`)) continue;
+    for (const p of POOLS[key]) {
+      if (taken.has(p.name)) continue;
+      const prev = byName.get(p.name);
+      if (!prev || p.rating > prev.rating) byName.set(p.name, p);
+    }
+  }
+  const pool = [...byName.values()];
+
+  const lineup = {};
+  const chosen = new Set();
+  for (const slot of SLOTS) {
+    const eligible = SLOT_ELIGIBLE[slot];
+    let pick = null;
+    for (let floor = minRating; floor >= 55 && !pick; floor -= 2) {
+      const options = pool.filter(
+        (p) => !chosen.has(p.name) && eligible.includes(p.position) && p.rating >= floor
+      );
+      if (options.length > 0) pick = options[Math.floor(rng() * options.length)];
+    }
+    if (!pick) return null; // era too thin at this slot — spin again
+    lineup[slot] = pick;
+    chosen.add(pick.name);
+  }
+  return { key: decade, decade, team: null, lineup };
+}
+
+/**
+ * Team-only spin inside a locked decade (Historic Battle): rerolls just the
+ * franchise reel. `excludeKeys` drops specific pools (e.g. the opponent's).
+ * When `openSlots` is given, only pools with an available player who naturally
+ * fits one of those slots qualify, so a strict draft never dead-ends.
+ */
+export function decadeSpin({
+  decade,
+  usedPoolKeys = [],
+  takenNames = [],
+  excludeKeys = [],
+  openSlots = null,
+  rng = Math.random,
+  minAvailable = 4,
+} = {}) {
+  const used = new Set([...usedPoolKeys, ...excludeKeys]);
+  const taken = new Set(takenNames);
+  const eligiblePositions = openSlots
+    ? new Set(openSlots.flatMap((s) => SLOT_ELIGIBLE[s]))
+    : null;
+  const candidates = POOL_KEYS.filter((key) => {
+    if (!key.startsWith(`${decade}|`)) return false;
+    if (used.has(key)) return false;
+    const avail = POOLS[key].filter((p) => !taken.has(p.name));
+    if (avail.length < minAvailable) return false;
+    if (eligiblePositions && !avail.some((p) => eligiblePositions.has(p.position))) return false;
+    return true;
+  });
+  if (candidates.length === 0) return null;
+  const key = candidates[Math.floor(rng() * candidates.length)];
+  const [d, team] = key.split("|");
+  return { key, decade: d, team, players: POOLS[key].filter((p) => !taken.has(p.name)) };
 }
 
 /**

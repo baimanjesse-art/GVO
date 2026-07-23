@@ -33,7 +33,7 @@ export default function App() {
         <PackGame navigate={navigate} />
       );
   else if (page === "battle")
-    screen = <BattleGame key={param || "pick"} mode={param} navigate={navigate} />;
+    screen = <BattleGame key={`${sportId}:${param || "pick"}`} mode={param} navigate={navigate} />;
   else if (page === "leaderboard") screen = <Leaderboard />;
   else if (page === "account") screen = <Account navigate={navigate} />;
   else if (page === "r" && param) screen = <SharedResult id={param} navigate={navigate} />;
@@ -59,9 +59,9 @@ export default function App() {
                 sportId={sportId}
                 onPick={(id) => {
                   sportCtl.setSport(id);
-                  // Only Solo is wired for football today — send the user there
-                  // when they flip sports off a basketball-only screen.
-                  if (id === "football" && !["", "solo"].includes(page)) navigate("/solo");
+                  // Rosters differ by sport — bounce off any in-progress mode
+                  // screen to Solo so state never carries across sports.
+                  if (!["", "solo"].includes(page)) navigate("/solo");
                 }}
               />
             )}
@@ -69,23 +69,23 @@ export default function App() {
               Solo
             </NavBtn>
             {!isFootball && (
-              <>
-                <NavBtn onClick={() => navigate("/draft")} active={page === "draft"}>
-                  <span className="sm:hidden">🎯</span>
-                  <span className="hidden sm:inline">Draft</span>
-                </NavBtn>
-                <NavBtn onClick={() => navigate("/battle")} active={page === "battle"}>
-                  <span className="sm:hidden">⚔️</span>
-                  <span className="hidden sm:inline">Battles</span>
-                </NavBtn>
-                <NavBtn
-                  onClick={() => navigate("/leaderboard")}
-                  active={page === "leaderboard"}
-                >
-                  <span className="sm:hidden">🏆</span>
-                  <span className="hidden sm:inline">Ranks</span>
-                </NavBtn>
-              </>
+              <NavBtn onClick={() => navigate("/draft")} active={page === "draft"}>
+                <span className="sm:hidden">🎯</span>
+                <span className="hidden sm:inline">Draft</span>
+              </NavBtn>
+            )}
+            <NavBtn onClick={() => navigate("/battle")} active={page === "battle"}>
+              <span className="sm:hidden">⚔️</span>
+              <span className="hidden sm:inline">Battles</span>
+            </NavBtn>
+            {!isFootball && (
+              <NavBtn
+                onClick={() => navigate("/leaderboard")}
+                active={page === "leaderboard"}
+              >
+                <span className="sm:hidden">🏆</span>
+                <span className="hidden sm:inline">Ranks</span>
+              </NavBtn>
             )}
             <AccountChip navigate={navigate} active={page === "account"} />
           </nav>

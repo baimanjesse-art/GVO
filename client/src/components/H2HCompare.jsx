@@ -10,10 +10,12 @@ import { copyText } from "../lib/share.js";
  * Head-to-head results: side-by-side rosters, season records, win probability,
  * stat edge breakdown and the simulated series.
  */
-export default function H2HCompare({ payload, youId, players, onRematch, readOnly }) {
+export default function H2HCompare({ payload, youId, players, onRematch, readOnly, sport }) {
   const r = payload?.h2h || payload;
   const [shareState, setShareState] = useState("");
   if (!r || !r.order) return null;
+  const Versus = sport?.Versus || FullCourt;
+  const singleGame = r.series.games.length === 1;
 
   const [idA, idB] = r.order;
   const nameA = r.names[idA];
@@ -21,7 +23,10 @@ export default function H2HCompare({ payload, youId, players, onRematch, readOnl
   const seasonA = r.seasons[idA];
   const seasonB = r.seasons[idB];
   const winnerName = r.names[r.winnerId];
-  const seriesScore = `${Math.max(r.series.winsA, r.series.winsB)}-${Math.min(r.series.winsA, r.series.winsB)}`;
+  const g0 = r.series.games[0];
+  const seriesScore = singleGame
+    ? `${Math.max(g0.a, g0.b)}-${Math.min(g0.a, g0.b)}`
+    : `${Math.max(r.series.winsA, r.series.winsB)}-${Math.min(r.series.winsA, r.series.winsB)}`;
   const youWon = youId && r.winnerId === youId;
 
   async function shareLink() {
@@ -108,8 +113,8 @@ export default function H2HCompare({ payload, youId, players, onRematch, readOnl
         ))}
       </div>
 
-      {/* both squads on one full court */}
-      <FullCourt
+      {/* both squads on one board */}
+      <Versus
         teamA={r.rosters[idA]}
         teamB={r.rosters[idB]}
         nameA={nameA}
@@ -160,10 +165,12 @@ export default function H2HCompare({ payload, youId, players, onRematch, readOnl
         </div>
       </div>
 
-      {/* series game log */}
+      {/* series / game log */}
       <div className="rounded-2xl border border-line bg-panel p-4">
         <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-300">
-          Best-of-7 · {winnerName} in {r.series.games.length}
+          {singleGame
+            ? `Final Score · ${winnerName}`
+            : `Best-of-7 · ${winnerName} in ${r.series.games.length}`}
         </h3>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {r.series.games.map((g, i) => (

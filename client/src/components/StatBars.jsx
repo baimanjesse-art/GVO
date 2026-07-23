@@ -7,6 +7,10 @@ const LABELS = {
   scoring: "Scoring",
   playmaking: "Playmaking",
   rebounding: "Rebounding",
+  // football
+  passing: "Passing",
+  receiving: "Receiving",
+  rushing: "Rushing",
 };
 
 function barColor(v) {
@@ -18,20 +22,21 @@ function barColor(v) {
 export default function StatBars({ components }) {
   return (
     <div className="space-y-2">
-      {Object.entries(components).map(([key, value]) => (
-        <div key={key} className="flex items-center gap-2 text-xs">
-          <span className="w-24 flex-none text-slate-400">{LABELS[key] || key}</span>
-          <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-black/40">
-            <div
-              className={`h-full rounded-full ${barColor(value)} transition-all duration-700`}
-              style={{ width: `${value}%` }}
-            />
+      {Object.entries(components).map(([key, value]) => {
+        const v = Math.round(value);
+        return (
+          <div key={key} className="flex items-center gap-2 text-xs">
+            <span className="w-24 flex-none text-slate-400">{LABELS[key] || key}</span>
+            <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-black/40">
+              <div
+                className={`h-full rounded-full ${barColor(v)} transition-all duration-700`}
+                style={{ width: `${Math.max(0, Math.min(100, v))}%` }}
+              />
+            </div>
+            <span className="w-8 flex-none text-right font-bold tabular-nums">{v}</span>
           </div>
-          <span className="w-8 flex-none text-right font-bold tabular-nums">
-            {value}
-          </span>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

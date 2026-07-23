@@ -7,15 +7,19 @@
 
 import { BASE_ELO, eloUpdate, overallToElo, rankFor } from "../../../shared/ranks.js";
 
-const KEY = "arena-career-v1";
+// Basketball keeps the original key; each other sport gets its own ladder so
+// football and basketball offline ranks never mix.
+function keyFor(sport) {
+  return !sport || sport === "basketball" ? "arena-career-v1" : `arena-career-${sport}-v1`;
+}
 
 function blank() {
   return { elo: BASE_ELO, wins: 0, losses: 0, best: BASE_ELO, games: 0 };
 }
 
-export function getCareer() {
+export function getCareer(sport) {
   try {
-    const saved = JSON.parse(localStorage.getItem(KEY));
+    const saved = JSON.parse(localStorage.getItem(keyFor(sport)));
     if (saved && typeof saved.elo === "number") return { ...blank(), ...saved };
   } catch {
     /* ignore */
@@ -23,9 +27,9 @@ export function getCareer() {
   return blank();
 }
 
-function save(career) {
+function save(career, sport) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(career));
+    localStorage.setItem(keyFor(sport), JSON.stringify(career));
   } catch {
     /* ignore */
   }
@@ -39,8 +43,8 @@ function save(career) {
  * Returns a summary the results screen can render:
  *   { before, after, delta, rankBefore, rankAfter, promoted, demoted, ...career }
  */
-export function recordBattle({ won, oppOverall, mode }) {
-  const career = getCareer();
+export function recordBattle({ won, oppOverall, mode, sport }) {
+  const career = getCareer(sport);
   const before = Math.round(career.elo);
   const rankBefore = rankFor(career.elo);
   const oppElo = overallToElo(oppOverall);
@@ -51,7 +55,7 @@ export function recordBattle({ won, oppOverall, mode }) {
   if (won) career.wins += 1;
   else career.losses += 1;
   career.best = Math.max(career.best, career.elo);
-  save(career);
+  save(career, sport);
 
   const after = Math.round(career.elo);
   const rankAfter = rankFor(career.elo);

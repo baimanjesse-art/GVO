@@ -141,7 +141,16 @@ export function evaluateTeam(roster) {
     0.03 * star +
     0.02 * depth;
 
-  const components = { talent, passing, receiving, rushing, fit, chemistry, star, depth };
+  const components = {
+    talent: Math.round(talent),
+    passing: Math.round(passing),
+    receiving: Math.round(receiving),
+    rushing: Math.round(rushing),
+    fit: Math.round(fit),
+    chemistry: Math.round(chemistry),
+    star: Math.round(star),
+    depth: Math.round(depth),
+  };
   const { strengths, weaknesses } = describe(components, { oopDetails, eraSpan, distinctDecades, qb });
 
   return {
