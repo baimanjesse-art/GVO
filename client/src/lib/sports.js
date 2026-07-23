@@ -67,6 +67,8 @@ const basketball = {
   randomLegend: bballRandomLegend,
   supportsHistoric: true,
   supportsAllTime: true,
+  // NBA decades have 20-30 teams, so a Historic draft takes one player per team.
+  historicUniqueTeams: true,
   seriesLabel: "best-of-7",
   // pack & play
   dealPacks: (opts) => bballDealPacks({ upgradedPosition: opts.upgraded, rng: opts.rng }),
@@ -119,10 +121,13 @@ const football = {
   eraLineupSpin: fbSpin.eraLineupSpin,
   decadeSpin: fbSpin.decadeSpin,
   pools: fbPlayers.POOLS,
-  bestLineup: null,
+  bestLineup: fbSpin.bestLineup,
   randomLegend: fbRandomLegend,
-  supportsHistoric: false,
+  supportsHistoric: true,
   supportsAllTime: true,
+  // NFL decades have only ~7-9 teams here, so one player per team can't field a
+  // seven-man squad — a team's pool can be drawn from more than once.
+  historicUniqueTeams: false,
   seriesLabel: "single game",
   dealPacks: (opts) => fbDealPacks({ upgraded: opts.upgraded, rng: opts.rng }),
   packSlotName: {

@@ -7,6 +7,7 @@ export default {
     ["Alvin Harper", "WR", 82, 817, 8, 36],
     ["Jay Novacek", "TE", 84, 705, 6, 68],
     ["Daryl Johnston", "RB", 74, 212, 2, 372],
+    ["Kevin Williams", "WR", 74, 613, 3, 30],
   ],
   "Buffalo Bills": [
     ["Jim Kelly", "QB", 89, 3844, 33, 100],
@@ -15,6 +16,7 @@ export default {
     ["James Lofton", "WR", 84, 1072, 8, 57],
     ["Don Beebe", "WR", 78, 570, 6, 33],
     ["Pete Metzelaars", "TE", 72, 452, 4, 42],
+    ["Kenneth Davis", "RB", 74, 613, 6, 80],
   ],
   "San Francisco 49ers": [
     ["Steve Young", "QB", 96, 3969, 35, 293],
@@ -23,9 +25,11 @@ export default {
     ["John Taylor", "WR", 85, 1049, 9, 56],
     ["Brent Jones", "TE", 84, 735, 4, 68],
     ["Terrell Owens", "WR", 88, 936, 8, 60],
+    ["J.J. Stokes", "WR", 78, 733, 4, 63],
   ],
   "Green Bay Packers": [
     ["Brett Favre", "QB", 95, 3899, 39, 136],
+    ["Sterling Sharpe", "WR", 90, 1461, 18, 112],
     ["Dorsey Levens", "RB", 82, 1435, 7, 370],
     ["Antonio Freeman", "WR", 86, 1424, 12, 81],
     ["Robert Brooks", "WR", 82, 1497, 13, 102],
@@ -39,6 +43,7 @@ export default {
     ["Shannon Sharpe", "TE", 90, 1107, 10, 72],
     ["Ed McCaffrey", "WR", 82, 1053, 10, 64],
     ["Howard Griffith", "RB", 66, 148, 3, 190],
+    ["Anthony Miller", "WR", 82, 1079, 7, 84],
   ],
   "Minnesota Vikings": [
     ["Randall Cunningham", "QB", 88, 3704, 34, 132],
@@ -47,6 +52,7 @@ export default {
     ["Robert Smith", "RB", 86, 1187, 6, 291],
     ["Jake Reed", "WR", 80, 1138, 4, 68],
     ["Andrew Glover", "TE", 70, 594, 6, 47],
+    ["Qadry Ismail", "WR", 74, 597, 4, 45],
   ],
   "Detroit Lions": [
     ["Scott Mitchell", "QB", 80, 4338, 32, 129],
@@ -55,6 +61,7 @@ export default {
     ["Brett Perriman", "WR", 82, 1488, 9, 108],
     ["Johnnie Morton", "WR", 80, 1057, 8, 68],
     ["David Sloan", "TE", 68, 264, 2, 24],
+    ["Willie Green", "WR", 72, 592, 3, 31],
   ],
   "Miami Dolphins": [
     ["Dan Marino", "QB", 94, 4453, 30, 60],
@@ -63,5 +70,6 @@ export default {
     ["Keith Jackson", "TE", 82, 613, 7, 59],
     ["Terry Kirby", "RB", 74, 612, 3, 393],
     ["Bernie Parmalee", "RB", 72, 868, 6, 249],
+    ["Karim Abdul-Jabbar", "RB", 78, 1116, 15, 113],
   ],
 };

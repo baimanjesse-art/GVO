@@ -16,6 +16,7 @@ export default {
     ["Eddie Lacy", "RB", 82, 1178, 11, 257],
     ["Greg Jennings", "WR", 85, 1265, 12, 76],
     ["Jermichael Finley", "TE", 78, 767, 8, 61],
+    ["Davante Adams", "WR", 88, 997, 12, 74],
   ],
   "Denver Broncos": [
     ["Peyton Manning", "QB", 97, 5477, 55, 6],
@@ -24,6 +25,7 @@ export default {
     ["Julius Thomas", "TE", 82, 788, 12, 65],
     ["Knowshon Moreno", "RB", 78, 1038, 10, 548],
     ["Wes Welker", "WR", 80, 778, 10, 73],
+    ["C.J. Anderson", "RB", 80, 720, 7, 183],
   ],
   "Atlanta Falcons": [
     ["Matt Ryan", "QB", 93, 4944, 38, 117],
@@ -32,6 +34,7 @@ export default {
     ["Mohamed Sanu", "WR", 78, 653, 4, 59],
     ["Taylor Gabriel", "WR", 76, 579, 6, 35],
     ["Austin Hooper", "TE", 74, 271, 3, 27],
+    ["Roddy White", "WR", 86, 1296, 6, 92],
   ],
   "Pittsburgh Steelers": [
     ["Ben Roethlisberger", "QB", 91, 4952, 34, 29],
@@ -40,6 +43,7 @@ export default {
     ["JuJu Smith-Schuster", "WR", 82, 917, 7, 58],
     ["Martavis Bryant", "WR", 79, 765, 6, 50],
     ["Heath Miller", "TE", 76, 592, 3, 60],
+    ["DeAngelo Williams", "RB", 80, 907, 11, 367],
   ],
   "Seattle Seahawks": [
     ["Russell Wilson", "QB", 90, 4024, 34, 553],
@@ -48,6 +52,7 @@ export default {
     ["Tyler Lockett", "WR", 82, 965, 10, 57],
     ["Jimmy Graham", "TE", 82, 923, 10, 65],
     ["Golden Tate", "WR", 78, 898, 7, 64],
+    ["Chris Carson", "RB", 80, 1151, 9, 266],
   ],
   "New Orleans Saints": [
     ["Drew Brees", "QB", 96, 5476, 46, 22],
@@ -56,6 +61,7 @@ export default {
     ["Alvin Kamara", "RB", 88, 728, 8, 826],
     ["Marques Colston", "WR", 84, 1154, 10, 83],
     ["Brandin Cooks", "WR", 84, 1138, 9, 84],
+    ["Mark Ingram", "RB", 82, 1043, 10, 416],
   ],
   "Dallas Cowboys": [
     ["Dak Prescott", "QB", 88, 4902, 30, 277],
@@ -64,6 +70,7 @@ export default {
     ["Amari Cooper", "WR", 85, 1189, 8, 79],
     ["Jason Witten", "TE", 82, 673, 3, 64],
     ["Cole Beasley", "WR", 76, 833, 5, 75],
+    ["Terrance Williams", "WR", 74, 840, 8, 52],
   ],
   "Carolina Panthers": [
     ["Cam Newton", "QB", 90, 3837, 35, 636],
@@ -72,5 +79,6 @@ export default {
     ["Kelvin Benjamin", "WR", 80, 1008, 9, 73],
     ["Devin Funchess", "WR", 76, 840, 8, 63],
     ["Jonathan Stewart", "RB", 78, 989, 6, 99],
+    ["Steve Smith", "WR", 86, 1394, 7, 88],
   ],
 };

@@ -10,6 +10,7 @@ export default {
     ["Boyd Dowler", "WR", 82, 903, 6, 54],
     ["Max McGee", "WR", 80, 787, 9, 51],
     ["Ron Kramer", "TE", 76, 555, 4, 37],
+    ["Carroll Dale", "WR", 80, 818, 7, 44],
   ],
   "Baltimore Colts": [
     ["Johnny Unitas", "QB", 92, 2824, 20, 92],
@@ -18,6 +19,7 @@ export default {
     ["Jimmy Orr", "WR", 82, 848, 11, 44],
     ["John Mackey", "TE", 88, 686, 7, 55],
     ["Tom Matte", "RB", 76, 662, 9, 293],
+    ["Willie Richardson", "WR", 78, 698, 8, 37],
   ],
   "Cleveland Browns": [
     ["Frank Ryan", "QB", 82, 2974, 25, 95],
@@ -26,6 +28,7 @@ export default {
     ["Paul Warfield", "WR", 90, 920, 9, 52],
     ["Milt Morin", "TE", 74, 388, 2, 26],
     ["Leroy Kelly", "RB", 88, 1141, 11, 282],
+    ["Ernie Green", "RB", 78, 750, 3, 342],
   ],
   "New York Jets": [
     ["Joe Namath", "QB", 89, 4007, 26, 0],
@@ -34,6 +37,7 @@ export default {
     ["Emerson Boozer", "RB", 80, 659, 5, 296],
     ["Matt Snell", "RB", 81, 948, 4, 264],
     ["Pete Lammons", "TE", 72, 455, 4, 41],
+    ["Bake Turner", "WR", 76, 767, 4, 45],
   ],
   "Kansas City Chiefs": [
     ["Len Dawson", "QB", 87, 2527, 26, 141],
@@ -42,6 +46,7 @@ export default {
     ["Chris Burford", "WR", 78, 660, 8, 45],
     ["Fred Arbanas", "TE", 76, 512, 5, 34],
     ["Curtis McClinton", "RB", 74, 540, 4, 227],
+    ["Frank Pitts", "WR", 72, 478, 4, 25],
   ],
   "Dallas Cowboys": [
     ["Don Meredith", "QB", 84, 2805, 24, 242],
@@ -50,6 +55,7 @@ export default {
     ["Dan Reeves", "RB", 78, 757, 8, 313],
     ["Lance Rentzel", "WR", 80, 996, 8, 54],
     ["Pettis Norman", "TE", 70, 356, 3, 28],
+    ["Frank Clarke", "WR", 80, 833, 6, 43],
   ],
   "Oakland Raiders": [
     ["Daryle Lamonica", "QB", 85, 3228, 30, 96],
@@ -58,5 +64,6 @@ export default {
     ["Hewritt Dixon", "RB", 78, 865, 5, 356],
     ["Clem Daniels", "RB", 80, 884, 5, 222],
     ["Billy Cannon", "TE", 74, 436, 10, 32],
+    ["Pete Banaszak", "RB", 72, 376, 8, 90],
   ],
 };

@@ -103,11 +103,17 @@ function Battle({ mode, sport }) {
   function doSpin() {
     let s;
     if (mode === "historic") {
+      // Deep leagues (basketball) draft one player per franchise; thin ones
+      // (football) may re-draw a team, so we only exclude the last pool to
+      // avoid landing on the same franchise twice in a row.
+      const unique = sport.historicUniqueTeams !== false;
       const opts = {
-        usedPoolKeys,
+        usedPoolKeys: unique ? usedPoolKeys : [],
         takenNames,
         decade: opponent.decade,
-        excludeKeys: [opponent.key],
+        excludeKeys: unique
+          ? [opponent.key]
+          : [opponent.key, usedPoolKeys[usedPoolKeys.length - 1]].filter(Boolean),
         openSlots: SLOTS.filter((slot) => !roster[slot]),
       };
       s = sport.decadeSpin(opts) || sport.decadeSpin({ ...opts, minAvailable: 1 });
@@ -566,6 +572,7 @@ function HistoricComingSoon({ navigate, sport }) {
 
 function ModePicker({ navigate, sport }) {
   const historic = sport.supportsHistoric;
+  const isBasketball = sport.id === "basketball";
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="py-6 text-center font-display text-4xl font-bold uppercase tracking-wide sm:text-5xl">
@@ -609,7 +616,7 @@ function ModePicker({ navigate, sport }) {
             All-Time Battle
           </div>
           <p className="mt-1 text-sm text-slate-400">
-            {historic
+            {isBasketball
               ? "The 72-10 Bulls. The 73-9 Warriors. The Dream Team. Every era spin deals five random 88+ stars, one per position — take one and build the squad that slays a legend."
               : "The 1972 Dolphins. The Greatest Show on Turf. Peyton's record offense. Every era spin deals one 88+ star per slot — take one and build the squad that slays a legend."}
           </p>

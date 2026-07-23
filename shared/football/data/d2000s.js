@@ -7,6 +7,7 @@ export default {
     ["Reggie Wayne", "WR", 90, 1310, 12, 83],
     ["Dallas Clark", "TE", 84, 616, 6, 58],
     ["Brandon Stokley", "WR", 78, 1077, 10, 68],
+    ["Joseph Addai", "RB", 82, 1081, 7, 325],
   ],
   "New England Patriots": [
     ["Tom Brady", "QB", 97, 4806, 50, 98],
@@ -24,6 +25,7 @@ export default {
     ["Torry Holt", "WR", 91, 1635, 7, 82],
     ["Ricky Proehl", "WR", 76, 563, 3, 37],
     ["Ernie Conwell", "TE", 70, 274, 2, 27],
+    ["Az-Zahir Hakim", "WR", 76, 734, 4, 53],
   ],
   "San Diego Chargers": [
     ["Philip Rivers", "QB", 90, 4009, 34, 48],
@@ -32,6 +34,7 @@ export default {
     ["Vincent Jackson", "WR", 85, 1098, 7, 59],
     ["Chris Chambers", "WR", 80, 555, 4, 35],
     ["Darren Sproles", "RB", 78, 330, 1, 342],
+    ["Malcom Floyd", "WR", 78, 717, 4, 45],
   ],
   "New Orleans Saints": [
     ["Drew Brees", "QB", 95, 5069, 34, 25],
@@ -40,6 +43,7 @@ export default {
     ["Reggie Bush", "RB", 82, 581, 6, 523],
     ["Jeremy Shockey", "TE", 80, 483, 3, 50],
     ["Devery Henderson", "WR", 76, 794, 3, 51],
+    ["Pierre Thomas", "RB", 78, 793, 6, 302],
   ],
   "Pittsburgh Steelers": [
     ["Ben Roethlisberger", "QB", 90, 3154, 32, 98],
@@ -48,6 +52,7 @@ export default {
     ["Santonio Holmes", "WR", 82, 942, 8, 55],
     ["Heath Miller", "TE", 80, 566, 6, 47],
     ["Jerome Bettis", "RB", 84, 1072, 8, 89],
+    ["Plaxico Burress", "WR", 82, 1325, 7, 66],
   ],
   "Arizona Cardinals": [
     ["Kurt Warner", "QB", 90, 4583, 30, 15],
@@ -56,14 +61,16 @@ export default {
     ["Steve Breaston", "WR", 78, 1006, 3, 71],
     ["Tim Hightower", "RB", 74, 399, 10, 237],
     ["Leonard Pope", "TE", 66, 322, 3, 28],
+    ["Edgerrin James", "RB", 80, 1222, 7, 73],
   ],
   "Minnesota Vikings": [
     ["Daunte Culpepper", "QB", 88, 4717, 39, 406],
     ["Randy Moss", "WR", 96, 1632, 17, 111],
-    ["Michael Bennett", "RB", 80, 1296, 5, 351],
+    ["Adrian Peterson", "RB", 90, 1341, 12, 268],
     ["Nate Burleson", "WR", 78, 1006, 9, 68],
     ["Jermaine Wiggins", "TE", 68, 705, 4, 71],
     ["Marcus Robinson", "WR", 76, 655, 6, 47],
+    ["Michael Bennett", "RB", 80, 1296, 5, 351],
   ],
   "Green Bay Packers": [
     ["Brett Favre", "QB", 90, 4155, 28, 42],
@@ -72,5 +79,6 @@ export default {
     ["Greg Jennings", "WR", 84, 1292, 12, 74],
     ["Bubba Franks", "TE", 72, 442, 7, 34],
     ["Ryan Grant", "RB", 78, 1203, 8, 138],
+    ["Javon Walker", "WR", 84, 1382, 12, 89],
   ],
 };

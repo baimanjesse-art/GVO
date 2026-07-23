@@ -28,6 +28,7 @@ export default {
     ["Gary Clark", "WR", 85, 1151, 7, 74],
     ["Ricky Sanders", "WR", 82, 1148, 12, 73],
     ["Don Warren", "TE", 74, 325, 2, 30],
+    ["George Rogers", "RB", 80, 1093, 18, 29],
   ],
   "Chicago Bears": [
     ["Jim McMahon", "QB", 82, 2392, 15, 252],
@@ -36,6 +37,7 @@ export default {
     ["Dennis McKinnon", "WR", 76, 555, 7, 31],
     ["Emery Moorehead", "TE", 70, 481, 3, 35],
     ["Matt Suhey", "RB", 74, 471, 1, 295],
+    ["Neal Anderson", "RB", 84, 1106, 15, 399],
   ],
   "San Diego Chargers": [
     ["Dan Fouts", "QB", 92, 4802, 33, 44],
@@ -44,6 +46,7 @@ export default {
     ["Charlie Joiner", "WR", 86, 1132, 4, 71],
     ["Chuck Muncie", "RB", 84, 1144, 19, 291],
     ["Wes Chandler", "WR", 88, 1032, 9, 49],
+    ["Lionel James", "RB", 76, 516, 2, 1027],
   ],
   "Los Angeles Raiders": [
     ["Jim Plunkett", "QB", 82, 2935, 18, 141],
@@ -52,6 +55,7 @@ export default {
     ["Cliff Branch", "WR", 82, 806, 5, 39],
     ["Dokie Williams", "WR", 78, 843, 8, 48],
     ["Kenny King", "RB", 72, 761, 4, 218],
+    ["Jessie Hester", "WR", 74, 513, 4, 26],
   ],
   "Cincinnati Bengals": [
     ["Boomer Esiason", "QB", 88, 3572, 28, 248],
@@ -60,6 +64,7 @@ export default {
     ["James Brooks", "RB", 84, 1087, 6, 686],
     ["Ickey Woods", "RB", 78, 1066, 15, 199],
     ["Rodney Holman", "TE", 74, 527, 4, 39],
+    ["Tim McGee", "WR", 80, 1211, 6, 65],
   ],
   "Denver Broncos": [
     ["John Elway", "QB", 90, 3891, 22, 304],
@@ -68,5 +73,6 @@ export default {
     ["Mark Jackson", "WR", 80, 875, 6, 46],
     ["Steve Watson", "WR", 80, 915, 5, 49],
     ["Clarence Kay", "TE", 70, 352, 3, 31],
+    ["Ricky Nattiel", "WR", 74, 630, 2, 31],
   ],
 };

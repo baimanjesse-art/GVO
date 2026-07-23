@@ -7,6 +7,7 @@ export default {
     ["Rashee Rice", "WR", 82, 938, 7, 79],
     ["Isiah Pacheco", "RB", 82, 935, 7, 244],
     ["JuJu Smith-Schuster", "WR", 78, 933, 3, 78],
+    ["Clyde Edwards-Helaire", "RB", 76, 803, 4, 297],
   ],
   "Buffalo Bills": [
     ["Josh Allen", "QB", 96, 4544, 37, 763],
@@ -15,6 +16,7 @@ export default {
     ["Gabe Davis", "WR", 80, 836, 7, 48],
     ["Dawson Knox", "TE", 76, 517, 5, 48],
     ["Cole Beasley", "WR", 76, 693, 4, 82],
+    ["Devin Singletary", "RB", 76, 870, 4, 228],
   ],
   "Cincinnati Bengals": [
     ["Joe Burrow", "QB", 95, 4611, 35, 257],
@@ -23,6 +25,7 @@ export default {
     ["Joe Mixon", "RB", 85, 1205, 13, 441],
     ["Tyler Boyd", "WR", 78, 762, 5, 67],
     ["Hayden Hurst", "TE", 72, 414, 2, 52],
+    ["Chase Brown", "RB", 80, 990, 7, 360],
   ],
   "Philadelphia Eagles": [
     ["Jalen Hurts", "QB", 92, 3701, 22, 760],
@@ -31,6 +34,7 @@ export default {
     ["Saquon Barkley", "RB", 94, 2005, 13, 278],
     ["Dallas Goedert", "TE", 82, 702, 3, 55],
     ["Kenneth Gainwell", "RB", 72, 240, 1, 130],
+    ["D'Andre Swift", "RB", 82, 1049, 5, 214],
   ],
   "Minnesota Vikings": [
     ["Kirk Cousins", "QB", 87, 4547, 29, 106],
@@ -39,6 +43,7 @@ export default {
     ["Adam Thielen", "WR", 80, 716, 6, 70],
     ["T.J. Hockenson", "TE", 84, 914, 6, 95],
     ["K.J. Osborn", "WR", 74, 540, 3, 48],
+    ["Jordan Addison", "WR", 82, 911, 10, 70],
   ],
   "San Francisco 49ers": [
     ["Brock Purdy", "QB", 88, 4280, 31, 144],
@@ -47,6 +52,7 @@ export default {
     ["Brandon Aiyuk", "WR", 88, 1342, 7, 75],
     ["George Kittle", "TE", 92, 1020, 6, 65],
     ["Jauan Jennings", "WR", 74, 265, 1, 24],
+    ["Elijah Mitchell", "RB", 76, 963, 5, 137],
   ],
   "Baltimore Ravens": [
     ["Lamar Jackson", "QB", 94, 3678, 24, 821],
@@ -55,6 +61,7 @@ export default {
     ["Zay Flowers", "WR", 84, 858, 5, 77],
     ["Rashod Bateman", "WR", 76, 756, 9, 45],
     ["Justice Hill", "RB", 68, 349, 3, 155],
+    ["Gus Edwards", "RB", 74, 810, 13, 180],
   ],
   "Detroit Lions": [
     ["Jared Goff", "QB", 88, 4575, 30, 21],
@@ -63,6 +70,7 @@ export default {
     ["Sam LaPorta", "TE", 86, 889, 10, 86],
     ["David Montgomery", "RB", 82, 1015, 13, 158],
     ["Jameson Williams", "WR", 76, 354, 2, 24],
+    ["Josh Reynolds", "WR", 72, 608, 5, 40],
   ],
   "Miami Dolphins": [
     ["Tua Tagovailoa", "QB", 88, 4624, 29, 70],
@@ -71,6 +79,7 @@ export default {
     ["De'Von Achane", "RB", 84, 800, 8, 197],
     ["Raheem Mostert", "RB", 82, 1012, 18, 175],
     ["Mike Gesicki", "TE", 74, 780, 2, 73],
+    ["Jeff Wilson Jr.", "RB", 74, 392, 3, 84],
   ],
   "Dallas Cowboys": [
     ["Dak Prescott", "QB", 90, 4516, 36, 242],
@@ -79,5 +88,6 @@ export default {
     ["Brandin Cooks", "WR", 80, 657, 8, 54],
     ["Jake Ferguson", "TE", 80, 761, 5, 71],
     ["Michael Gallup", "WR", 74, 418, 2, 34],
+    ["Rico Dowdle", "RB", 74, 361, 2, 144],
   ],
 };

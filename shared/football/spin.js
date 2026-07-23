@@ -148,6 +148,35 @@ export function decadeSpin({
 }
 
 /**
+ * Field the strongest seven-man offense from a pool (a real team's roster in
+ * Historic Battle): assign players to the seven slots to maximize rating minus
+ * out-of-position penalties. Pools are small (~7), so exhaustive search is cheap.
+ */
+export function bestLineup(pool) {
+  if (!pool || pool.length < SLOTS.length) return null;
+  let best = null;
+  const used = new Array(pool.length).fill(false);
+  const assign = {};
+  function place(slotIdx, value) {
+    if (slotIdx === SLOTS.length) {
+      if (!best || value > best.value) best = { value, roster: { ...assign } };
+      return;
+    }
+    const slot = SLOTS[slotIdx];
+    for (let i = 0; i < pool.length; i++) {
+      if (used[i]) continue;
+      used[i] = true;
+      assign[slot] = pool[i];
+      place(slotIdx + 1, value + pool[i].rating - OOP_PENALTY[fitDistance(pool[i], slot)]);
+      used[i] = false;
+    }
+    delete assign[slot];
+  }
+  place(0, 0);
+  return best ? best.roster : null;
+}
+
+/**
  * Choose the best available player + open slot for a partially-filled roster.
  * Maximizes rating minus the out-of-position penalty. With `naturalOnly`, only
  * pairings where the player naturally fills the slot are considered.

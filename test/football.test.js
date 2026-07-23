@@ -11,7 +11,7 @@ import {
   makeRng,
   SEASON_GAMES,
 } from "../shared/football/sim.js";
-import { spinWheel, respinSpin, canRespin, bestPick, eraLineupSpin, decadeSpin } from "../shared/football/spin.js";
+import { spinWheel, respinSpin, canRespin, bestPick, eraLineupSpin, decadeSpin, bestLineup } from "../shared/football/spin.js";
 import { LEGENDS, randomLegend } from "../shared/football/legends.js";
 import { dealPacks, PACK_SIZE, PREMIUM_FLOOR, ELITE_FLOOR } from "../shared/football/packs.js";
 
@@ -153,6 +153,22 @@ test("era-lineup deal fills all seven slots with eligible players", () => {
   }
   // exhausting every decade returns null
   assert.equal(eraLineupSpin({ usedDecades: ["1960s", "1970s", "1980s", "1990s", "2000s", "2010s", "2020s"] }), null);
+});
+
+test("every team-era is seven deep and bestLineup fields a full seven", () => {
+  for (const [key, pool] of Object.entries(POOLS)) {
+    assert.ok(pool.length >= 7, `${key} has only ${pool.length} — Historic needs 7`);
+    const lineup = bestLineup(pool);
+    assert.ok(lineup, `${key} could not field a lineup`);
+    const names = new Set();
+    for (const slot of SLOTS) {
+      assert.ok(lineup[slot], `${key} left ${slot} empty`);
+      names.add(lineup[slot].name);
+    }
+    assert.equal(names.size, 7, `${key} reused a player`);
+    // the lone QB should land at QB, never out of position
+    assert.equal(lineup.QB.position, "QB", `${key} put a non-QB under center`);
+  }
 });
 
 test("every legendary squad is a valid, gradable full seven", () => {

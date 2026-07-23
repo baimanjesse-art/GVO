@@ -7,6 +7,7 @@ export default {
     ["John Stallworth", "WR", 87, 798, 9, 44],
     ["Rocky Bleier", "RB", 76, 1036, 4, 294],
     ["Bennie Cunningham", "TE", 72, 321, 3, 27],
+    ["Frank Lewis", "WR", 76, 463, 3, 26],
   ],
   "Oakland Raiders": [
     ["Ken Stabler", "QB", 87, 2737, 27, 12],
@@ -15,6 +16,7 @@ export default {
     ["Mark van Eeghen", "RB", 80, 1012, 7, 162],
     ["Dave Casper", "TE", 86, 771, 9, 53],
     ["Clarence Davis", "RB", 74, 668, 4, 120],
+    ["Pete Banaszak", "RB", 74, 370, 10, 90],
   ],
   "Dallas Cowboys": [
     ["Roger Staubach", "QB", 89, 2620, 18, 320],
@@ -23,6 +25,7 @@ export default {
     ["Golden Richards", "WR", 76, 416, 4, 24],
     ["Preston Pearson", "RB", 74, 233, 1, 384],
     ["Billy Joe DuPree", "TE", 78, 509, 4, 41],
+    ["Tony Hill", "WR", 80, 1062, 10, 60],
   ],
   "Miami Dolphins": [
     ["Bob Griese", "QB", 87, 2089, 19, 89],
@@ -31,6 +34,7 @@ export default {
     ["Mercury Morris", "RB", 82, 1000, 12, 168],
     ["Jim Kiick", "RB", 74, 521, 3, 232],
     ["Marv Fleming", "TE", 70, 331, 4, 26],
+    ["Nat Moore", "WR", 80, 765, 4, 48],
   ],
   "Minnesota Vikings": [
     ["Fran Tarkenton", "QB", 88, 2994, 25, 108],
@@ -39,6 +43,7 @@ export default {
     ["Sammy White", "WR", 82, 906, 10, 51],
     ["John Gilliam", "WR", 80, 1035, 7, 47],
     ["Stu Voigt", "TE", 70, 349, 3, 28],
+    ["Bob Grim", "WR", 72, 691, 4, 40],
   ],
   "Cincinnati Bengals": [
     ["Ken Anderson", "QB", 87, 3169, 21, 125],
@@ -47,6 +52,7 @@ export default {
     ["Essex Johnson", "RB", 76, 997, 6, 210],
     ["Chip Myers", "WR", 76, 674, 3, 44],
     ["Bob Trumpy", "TE", 80, 449, 4, 37],
+    ["Pete Johnson", "RB", 78, 865, 14, 146],
   ],
   "Los Angeles Rams": [
     ["Roman Gabriel", "QB", 82, 2238, 15, 137],
@@ -55,5 +61,6 @@ export default {
     ["Jack Snow", "WR", 78, 604, 6, 34],
     ["Charlie Young", "TE", 76, 512, 3, 42],
     ["Jim Bertelsen", "RB", 72, 619, 5, 236],
+    ["Ron Jessie", "WR", 76, 742, 4, 42],
   ],
 };
