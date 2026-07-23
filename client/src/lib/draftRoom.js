@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "./supabase.js";
+import { mergeRealtimeRow } from "./realtimeMerge.js";
 
 /**
  * Realtime draft-room client. Subscribes to a single `draft_rooms` row and
@@ -31,7 +32,7 @@ export function useDraftRoom() {
           "postgres_changes",
           { event: "*", schema: "public", table: "draft_rooms", filter: `code=eq.${code}` },
           (payload) => {
-            if (payload.new) setRoom(payload.new);
+            if (payload.new) setRoom((prev) => mergeRealtimeRow(prev, payload.new));
           }
         )
         .subscribe();

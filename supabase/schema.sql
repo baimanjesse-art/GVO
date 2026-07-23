@@ -87,6 +87,14 @@ revoke insert, update, delete on public.draft_rooms from authenticated, anon;
 -- Broadcast row changes to both players in real time.
 alter publication supabase_realtime add table public.draft_rooms;
 
+-- `pool` is a large JSONB column that Postgres stores out-of-line ("TOASTed").
+-- Updates that don't touch `pool` (e.g. make_pick, which only changes `picks`)
+-- would otherwise broadcast it as omitted/null over realtime, since the WAL
+-- output for logical replication skips unchanged TOASTed values by default.
+-- REPLICA IDENTITY FULL forces the full row on every change, so the picking
+-- player's pool never blanks out mid-draft.
+alter table public.draft_rooms replica identity full;
+
 -- ---------------------------------------------------------------------------
 -- 3) FUNCTIONS — create / join / start / pick / place / finish
 -- ---------------------------------------------------------------------------
@@ -336,6 +344,9 @@ drop policy if exists "pack rooms readable" on public.pack_rooms;
 create policy "pack rooms readable" on public.pack_rooms for select to authenticated using (true);
 revoke insert, update, delete on public.pack_rooms from authenticated, anon;
 alter publication supabase_realtime add table public.pack_rooms;
+
+-- host_roster/guest_roster are large JSONB too — same TOAST fix as draft_rooms.
+alter table public.pack_rooms replica identity full;
 
 create or replace function public.create_pack_room(p_host_name text)
 returns text language plpgsql security definer set search_path = public as $$

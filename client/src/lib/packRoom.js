@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "./supabase.js";
+import { mergeRealtimeRow } from "./realtimeMerge.js";
 
 /**
  * Realtime pack-versus room. Each player opens their own packs blind, submits a
@@ -30,7 +31,7 @@ export function usePackRoom() {
           "postgres_changes",
           { event: "*", schema: "public", table: "pack_rooms", filter: `code=eq.${code}` },
           (payload) => {
-            if (payload.new) setRoom(payload.new);
+            if (payload.new) setRoom((prev) => mergeRealtimeRow(prev, payload.new));
           }
         )
         .subscribe();
