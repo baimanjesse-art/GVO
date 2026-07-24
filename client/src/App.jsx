@@ -7,6 +7,7 @@ import DraftGame from "./screens/DraftGame.jsx";
 import PackGame from "./screens/PackGame.jsx";
 import PackVersus from "./screens/PackVersus.jsx";
 import KeepCut from "./screens/KeepCut.jsx";
+import Auction from "./screens/Auction.jsx";
 import Leaderboard from "./screens/Leaderboard.jsx";
 import SharedResult from "./screens/SharedResult.jsx";
 import Account from "./screens/Account.jsx";
@@ -36,6 +37,7 @@ export default function App() {
   else if (page === "battle")
     screen = <BattleGame key={`${sportId}:${param || "pick"}`} mode={param} navigate={navigate} />;
   else if (page === "keepcut") screen = <KeepCut key={sportId} />;
+  else if (page === "auction") screen = <Auction code={param} navigate={navigate} />;
   else if (page === "leaderboard") screen = <Leaderboard />;
   else if (page === "account") screen = <Account navigate={navigate} />;
   else if (page === "r" && param) screen = <SharedResult id={param} navigate={navigate} />;
@@ -81,6 +83,10 @@ export default function App() {
             <NavBtn onClick={() => navigate("/keepcut")} active={page === "keepcut"}>
               <span className="sm:hidden">✂️</span>
               <span className="hidden sm:inline">Keep/Cut</span>
+            </NavBtn>
+            <NavBtn onClick={() => navigate("/auction")} active={page === "auction"}>
+              <span className="sm:hidden">💰</span>
+              <span className="hidden sm:inline">Auction</span>
             </NavBtn>
             {isFootball && (
               <NavBtn onClick={() => navigate("/packs")} active={page === "packs"}>

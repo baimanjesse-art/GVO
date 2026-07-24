@@ -457,3 +457,153 @@ grant execute on function
   public.submit_pack_team(text, text, jsonb),
   public.finish_pack(text, int, jsonb)
 to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 7) ONLINE AUCTION — both players get $20 and bid, one player at a time, to
+--    build their rosters; then the squads sim. The bidding rules live in
+--    shared/auction.js and run on the clients; the room stores the live state
+--    JSONB and a version counter (optimistic lock) so the two clients stay in
+--    lockstep. Only the player on the clock submits a move, so races are rare;
+--    the version check rejects any stale write.
+-- ---------------------------------------------------------------------------
+create table if not exists public.auction_rooms (
+  code        text primary key,
+  host        uuid references auth.users(id) on delete cascade,
+  guest       uuid references auth.users(id) on delete set null,
+  host_name   text,
+  guest_name  text,
+  status      text not null default 'lobby',   -- lobby | bidding | done
+  sport       text not null default 'basketball',
+  seed        bigint,
+  queue       jsonb not null default '[]'::jsonb,   -- the players up for auction
+  state       jsonb,                                -- live auction state (budgets, won, index, turn…)
+  version     int not null default 0,               -- optimistic-lock counter
+  result      jsonb,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+
+alter table public.auction_rooms enable row level security;
+drop policy if exists "auction rooms readable" on public.auction_rooms;
+create policy "auction rooms readable" on public.auction_rooms for select to authenticated using (true);
+revoke insert, update, delete on public.auction_rooms from authenticated, anon;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'auction_rooms'
+  ) then
+    alter publication supabase_realtime add table public.auction_rooms;
+  end if;
+end $$;
+
+-- queue + state are large JSONB — same TOAST fix as the other rooms.
+alter table public.auction_rooms replica identity full;
+
+create or replace function public.create_auction_room(p_host_name text, p_sport text default 'basketball')
+returns text language plpgsql security definer set search_path = public as $$
+declare
+  chars text := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  new_code text; i int;
+begin
+  loop
+    new_code := '';
+    for i in 1..4 loop
+      new_code := new_code || substr(chars, floor(random()*length(chars))::int + 1, 1);
+    end loop;
+    exit when not exists (select 1 from public.auction_rooms where code = new_code);
+  end loop;
+  insert into public.auction_rooms (code, host, host_name, sport)
+  values (new_code, auth.uid(), p_host_name, coalesce(p_sport, 'basketball'));
+  return new_code;
+end; $$;
+
+create or replace function public.join_auction_room(room_code text, p_guest_name text)
+returns public.auction_rooms language plpgsql security definer set search_path = public as $$
+declare r public.auction_rooms;
+begin
+  select * into r from public.auction_rooms where code = room_code for update;
+  if not found then raise exception 'Room not found'; end if;
+  if r.status <> 'lobby' then raise exception 'Match already started'; end if;
+  if r.host = auth.uid() then raise exception 'You are already the host'; end if;
+  if r.guest is not null then raise exception 'Room is full'; end if;
+  update public.auction_rooms
+     set guest = auth.uid(), guest_name = p_guest_name, updated_at = now()
+   where code = room_code returning * into r;
+  return r;
+end; $$;
+
+-- Host opens the auction with a client-generated queue, seed and initial state.
+create or replace function public.start_auction(room_code text, p_queue jsonb, p_seed bigint, p_state jsonb)
+returns public.auction_rooms language plpgsql security definer set search_path = public as $$
+declare r public.auction_rooms;
+begin
+  select * into r from public.auction_rooms where code = room_code for update;
+  if not found then raise exception 'Room not found'; end if;
+  if r.host <> auth.uid() then raise exception 'Only the host can start'; end if;
+  if r.guest is null then raise exception 'Waiting for a second player'; end if;
+  if r.status <> 'lobby' then raise exception 'Already started'; end if;
+  update public.auction_rooms
+     set queue = p_queue, seed = p_seed, state = p_state, version = 0,
+         status = 'bidding', updated_at = now()
+   where code = room_code returning * into r;
+  return r;
+end; $$;
+
+-- Apply one bid/pass: the client computes the next state (shared/auction.js)
+-- and submits it with the version it acted on. Rejected if someone already
+-- moved (optimistic lock), so the two clients can't diverge.
+create or replace function public.auction_action(room_code text, p_state jsonb, p_expected_version int)
+returns public.auction_rooms language plpgsql security definer set search_path = public as $$
+declare r public.auction_rooms;
+begin
+  select * into r from public.auction_rooms where code = room_code for update;
+  if not found then raise exception 'Room not found'; end if;
+  if r.status <> 'bidding' then raise exception 'Auction is not active'; end if;
+  if auth.uid() not in (r.host, r.guest) then raise exception 'Not in this room'; end if;
+  if r.version <> p_expected_version then raise exception 'Out of sync — refresh'; end if;
+  update public.auction_rooms
+     set state = p_state, version = r.version + 1, updated_at = now()
+   where code = room_code returning * into r;
+  return r;
+end; $$;
+
+-- Host finalizes once the auction's state is complete: winner (0=host,1=guest)
+-- gains Elo, same account rank as the other online modes.
+create or replace function public.finish_auction(room_code text, winner int, p_result jsonb)
+returns public.auction_rooms language plpgsql security definer set search_path = public as $$
+declare
+  r public.auction_rooms;
+  w uuid; l uuid; w_elo int; l_elo int; expected numeric; gain int;
+begin
+  select * into r from public.auction_rooms where code = room_code for update;
+  if not found then raise exception 'Room not found'; end if;
+  if r.status = 'done' then return r; end if;
+  if r.status <> 'bidding' then raise exception 'Auction not ready to finish'; end if;
+  if auth.uid() not in (r.host, r.guest) then raise exception 'Not in this room'; end if;
+  if winner not in (0,1) then raise exception 'Bad winner'; end if;
+
+  w := case when winner = 0 then r.host else r.guest end;
+  l := case when winner = 0 then r.guest else r.host end;
+  select elo into w_elo from public.profiles where id = w;
+  select elo into l_elo from public.profiles where id = l;
+  expected := 1.0 / (1.0 + power(10, (l_elo - w_elo) / 400.0));
+  gain := round(32 * (1 - expected));
+
+  update public.profiles set elo = elo + gain, best_elo = greatest(best_elo, elo + gain),
+         wins = wins + 1, updated_at = now() where id = w;
+  update public.profiles set losses = losses + 1, updated_at = now() where id = l;
+
+  update public.auction_rooms
+     set status = 'done', result = jsonb_set(coalesce(p_result,'{}'::jsonb), '{eloGain}', to_jsonb(gain)), updated_at = now()
+   where code = room_code returning * into r;
+  return r;
+end; $$;
+
+grant execute on function
+  public.create_auction_room(text, text),
+  public.join_auction_room(text, text),
+  public.start_auction(text, jsonb, bigint, jsonb),
+  public.auction_action(text, jsonb, int),
+  public.finish_auction(text, int, jsonb)
+to authenticated;

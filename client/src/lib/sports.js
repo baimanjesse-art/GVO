@@ -27,6 +27,35 @@ function emptyFrom(slots) {
   return Object.fromEntries(slots.map((s) => [s, null]));
 }
 
+function shuffle(arr, rng) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Basketball auction pool: strong players, shuffled (any five build a lineup).
+function bballAuctionQueue({ rng = Math.random, minRating = 80 } = {}) {
+  const n = 5 * 2 + 6; // queueSize(5)
+  let cands = bballDraft.allPlayersUnique().filter((p) => p.rating >= minRating);
+  if (cands.length < n) cands = bballDraft.allPlayersUnique().slice();
+  return shuffle(cands.slice(), rng).slice(0, n);
+}
+
+// Football auction pool: guarantee QBs and TEs to go around, rest skill.
+function fbAuctionQueue({ rng = Math.random, minRating = 80 } = {}) {
+  const quota = { QB: 3, RB: 6, WR: 8, TE: 3 }; // sums to 20 = queueSize(7)
+  const unique = fbPlayers.allPlayersUnique();
+  const out = [];
+  for (const [pos, count] of Object.entries(quota)) {
+    let cands = unique.filter((p) => p.position === pos && p.rating >= minRating);
+    if (cands.length < count) cands = unique.filter((p) => p.position === pos);
+    out.push(...shuffle(cands.slice(), rng).slice(0, count));
+  }
+  return shuffle(out, rng);
+}
+
 // Football per-player box-score labels depend on his position (see the data
 // files: QB rows are passYds/passTD/rushYds, RB rushYds/rushTD/recYds, and
 // WR/TE recYds/recTD/receptions).
@@ -94,6 +123,8 @@ const basketball = {
   supportsDraftOnline: true,
   // every unique player (best-rated stint), for keep-or-cut / auction pools
   allPlayers: bballDraft.allPlayersUnique,
+  auctionQueue: bballAuctionQueue,
+  supportsAuctionOnline: true,
   // season framing
   seasonGames: 82,
   seasonLabel: "82-game season",
@@ -163,6 +194,8 @@ const football = {
   draftPoolSize: fbDraft.DRAFT_POOL_SIZE,
   supportsDraftOnline: true,
   allPlayers: fbPlayers.allPlayersUnique,
+  auctionQueue: fbAuctionQueue,
+  supportsAuctionOnline: true,
   seasonGames: 17,
   seasonLabel: "17-game season",
   simCta: "Sim the 17-game season",
