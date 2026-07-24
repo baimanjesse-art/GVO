@@ -92,6 +92,8 @@ const basketball = {
   picksPerPlayer: bballDraft.PICKS_PER_PLAYER,
   draftPoolSize: bballDraft.DRAFT_POOL_SIZE,
   supportsDraftOnline: true,
+  // every unique player (best-rated stint), for keep-or-cut / auction pools
+  allPlayers: bballDraft.allPlayersUnique,
   // season framing
   seasonGames: 82,
   seasonLabel: "82-game season",
@@ -160,6 +162,7 @@ const football = {
   picksPerPlayer: fbDraft.PICKS_PER_PLAYER,
   draftPoolSize: fbDraft.DRAFT_POOL_SIZE,
   supportsDraftOnline: true,
+  allPlayers: fbPlayers.allPlayersUnique,
   seasonGames: 17,
   seasonLabel: "17-game season",
   simCta: "Sim the 17-game season",

@@ -165,9 +165,24 @@ export default function Home({ navigate }) {
           </p>
         </button>
         <button
+          onClick={() => navigate("/keepcut")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98] sm:col-span-2"
+          style={{ animationDelay: "300ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">✂️</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-hoop2">
+            Keep or Cut
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Eight players, one at a time. Keep three, cut five — snap decisions,
+            no takebacks. How close can you get to holding onto the best of the
+            bunch?
+          </p>
+        </button>
+        <button
           onClick={() => navigate("/leaderboard")}
           className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-hoop hover:bg-panel2 hover:shadow-xl hover:shadow-hoop/10 active:scale-[0.98] sm:col-span-2"
-          style={{ animationDelay: "320ms", animationFillMode: "backwards" }}
+          style={{ animationDelay: "360ms", animationFillMode: "backwards" }}
         >
           <div className="flex items-center gap-4">
             <div className="text-3xl">🏆</div>
@@ -327,6 +342,22 @@ function FootballHome({ navigate, marquee }) {
             Seven packs, one per roster slot — each deals five 80+ players.
             Upgrade one slot to 88+/90+, take one from each. Solo for the
             leaderboard, or open packs against a friend for Elo.
+          </p>
+        </button>
+
+        <button
+          onClick={() => navigate("/keepcut")}
+          className="group animate-slide-up rounded-2xl border border-line bg-panel p-6 text-left transition hover:-translate-y-0.5 hover:border-emerald-500 hover:bg-panel2 hover:shadow-xl hover:shadow-emerald-500/10 active:scale-[0.98] sm:col-span-2"
+          style={{ animationDelay: "240ms", animationFillMode: "backwards" }}
+        >
+          <div className="text-3xl">✂️</div>
+          <div className="mt-2 font-display text-2xl font-bold uppercase tracking-wide group-hover:text-emerald-300">
+            Keep or Cut
+          </div>
+          <p className="mt-1 text-sm text-slate-400">
+            Eight players, one at a time. Keep three, cut five — snap decisions,
+            no takebacks. How close can you get to holding onto the best of the
+            bunch?
           </p>
         </button>
       </div>
